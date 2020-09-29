@@ -31,3 +31,4 @@ public class TestConfig {
     @IntegerConfiguration(max=10)
     public int delay;
 }
+
