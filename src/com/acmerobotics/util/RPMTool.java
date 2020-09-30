@@ -28,8 +28,12 @@ public class RPMTool {
      * motor that you want to read the RPM of or write the RPM needs to be passed as the motor parameter.
      * The ticks per revolution also needs to be passed as a parameter (you'll find value on motor website).
      */
-    public RPMTool(HardwareMap hardwareMap, DcMotorEx motor, double TICKS_PER_REVOLUTION){
+    public RPMTool(){
+        time = new ElapsedTime();
+    }
 
+
+    public void registerMotor(HardwareMap hardwareMap, DcMotorEx motor, double TICKS_PER_REVOLUTION){
         this.TICKS_PER_REVOLUTION = TICKS_PER_REVOLUTION;
 
         this.motor = motor;
@@ -37,8 +41,6 @@ public class RPMTool {
         this.motor = hardwareMap.get(DcMotorEx.class, "motor");
 
         this.motor.setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
-
-        time = new ElapsedTime();
     }
 
 
