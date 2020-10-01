@@ -23,7 +23,7 @@ public class TestSubsystem extends Subsystem {
                                                                 // include hardwareMap for the color sensor
         super("TestSubsystem");
 
-        motor = robot.getMotor("motor");
+        motor = robot.getMotor("motor1");
         motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
