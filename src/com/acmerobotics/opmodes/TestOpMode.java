@@ -38,27 +38,30 @@ public class TestOpMode extends LinearOpMode {
             telemetry.addLine("start");
             telemetry.update();
             robot.update();
-//
-//            if (gamepad1.right_trigger > 0){
-//                robot.subsystem.setPower(gamepad1.right_trigger);
-//            }
-//
-//            else{
-//
-//                robot.subsystem.setPower(0);
-//            }
-//
-//            if (gamepad1.a){
-//                robot.subsystem.servoPositionOne();
-//            }
-//
-//            if (gamepad1.b){
-//                robot.subsystem.servoPositionTwo();
-//            }
-//
-//            robot.update();
+
+            if (gamepad1.right_trigger > 0){
+                robot.subsystem.setPower(gamepad1.right_trigger);
+            }
+
+            else{
+
+                robot.subsystem.setPower(0);
+            }
+
+            if (gamepad1.a){
+                robot.subsystem.servoPositionOne();
+            }
+
+            if (gamepad1.b){
+                robot.subsystem.servoPositionTwo();
+            }
+
+            robot.update(); // hardware devices and telemeteryData will only be updated within the Robot update()
 
         ////////////////////////////////////////
+
+        // below will mostly be useful to auto
+
 //        robot.subsystem.setPower(0.5);
 //
 //        robot.runForTime(2000);
