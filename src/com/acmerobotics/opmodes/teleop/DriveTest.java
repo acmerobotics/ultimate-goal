@@ -16,7 +16,7 @@ public class DriveTest extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        Drive drive = new Drive(hardwareMap, true);
+        Drive drive = new Drive(hardwareMap, true, telemetry);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();

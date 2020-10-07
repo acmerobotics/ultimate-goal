@@ -1,9 +1,12 @@
 package com.acmerobotics.robot;
 
+import android.sax.StartElementListener;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.robomatic.hardware.CachingSensor;
@@ -20,6 +23,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -98,9 +102,15 @@ public class Drive { //needs to extend subsystem at some point
         TURN
     }
 
-    private double Ytarget = 0;
+    public double Ytarget = 0;
     private double Xtarget = 0;
     private double turnTarget = 0;
+    public double correction;
+
+    private double robotPower;
+
+    private int targetPosition = 0;
+    private int targetMotorPos;
 
     // should be changed if needed (in inches might change to ticks if needed)
     private double YErrorTolerance = 3;
@@ -115,11 +125,14 @@ public class Drive { //needs to extend subsystem at some point
     private LinearOpMode opMode;
 
 
-    public Drive(HardwareMap hardwareMap, boolean inTeleOp){
+    public Drive(HardwareMap hardwareMap, boolean inTeleOp, Telemetry telemetry){
         //TODO: add Robot robot, linearopmode Opmode above
         //super("Drive");
 
         this.opMode = opMode;
+
+       // telemetry.addData("current 0 motor pos", motors[0].getCurrentPosition());
+        //telemetry.update();
 
         //stoneServo = robot.getServo("stoneServo");
 
@@ -132,10 +145,18 @@ public class Drive { //needs to extend subsystem at some point
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
         pidController = new PIDController(P, I, D);
-
+/*
         for (int i=0; i<4;i++){
             motors[i] = hardwareMap.get(DcMotorEx.class, "m" + i);
         }
+
+ */
+
+        motors[0] = hardwareMap.get(DcMotorEx.class, "m0");
+        motors[1] = hardwareMap.get(DcMotorEx.class, "m1");
+        motors[2] = hardwareMap.get(DcMotorEx.class, "m2");
+        motors[3] = hardwareMap.get(DcMotorEx.class, "m3");
+
 
 
         if(!inTeleOp){
@@ -164,8 +185,8 @@ public class Drive { //needs to extend subsystem at some point
             motors[3].setDirection(DcMotorEx.Direction.REVERSE);
 
             for (int i = 0; i < 4; i++){
-                motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+                motors[i].setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             }
 
         }
@@ -175,8 +196,9 @@ public class Drive { //needs to extend subsystem at some point
 
 
     // @Override
-    public void update(Canvas overlay){
-       // telemetryData.addData("m0 current pos ", motors[0].getCurrentPosition());
+    public void update(){
+        //add in Canvas overlay later for robomatic
+       //telemetryData.addData("m0 current pos ", motors[0].getCurrentPosition());
        // telemetryData.addData("m0 power ", motors[0].getPower());
 
        // telemetryData.addData("heading (radians)", imuSensor.getValue());
@@ -184,7 +206,6 @@ public class Drive { //needs to extend subsystem at some point
       //  telemetryData.addData("inTeleOp ", inTeleOp);
 
      //   telemetryData.addData("autoMode ", autoMode);
-
 
         if (!inTeleOp){
 
@@ -197,19 +218,31 @@ public class Drive { //needs to extend subsystem at some point
                 case UNKNOWN:
 
                     // create variables that will be used in other cases
-                    double target;
-                    double correction;
 
                 case Y:
 
-                    target = motors[0].getCurrentPosition() + Ytarget;
-                    error = target - motors[0].getCurrentPosition();
-
+                    error = Ytarget - motors[0].getCurrentPosition();
                     correction = pidController.update(error);
 
                     for (int i= 0; i < 4; i++) {
-                        motors[i].setPower(correction);
+                        motors[i].setPower(1);
+                       // motors[i].setTargetPosition((int) correction);
+                       // motors[i].setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
                     }
+
+                    /*motors[0].setTargetPosition(motorEncodersInchesToTicks(targetPosition));
+                    motors[1].setTargetPosition(motorEncodersInchesToTicks(targetPosition));
+                    motors[2].setTargetPosition(motorEncodersInchesToTicks(targetPosition));
+                    motors[3].setTargetPosition(motorEncodersInchesToTicks(targetPosition));
+
+                    motors[0].setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    motors[1].setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    motors[2].setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+                    motors[3].setMode(DcMotorEx.RunMode.RUN_TO_POSITION);
+
+                     */
+
+
 
                     break;
 
@@ -220,8 +253,8 @@ public class Drive { //needs to extend subsystem at some point
                     // TODO add strafe alignment correction
                     // the target and error are based on motors 0 and 2 but the values and the same
                     // for motors 1 and 3 but opposite sign
-                    target = strafeCurrentPosition() + Xtarget;
-                    error = target - strafeCurrentPosition();
+                    Xtarget = strafeCurrentPosition() + Xtarget;
+                    error = Xtarget - strafeCurrentPosition();
 
                     correction = pidController.update(error);
 
@@ -234,8 +267,8 @@ public class Drive { //needs to extend subsystem at some point
 
                 case TURN:
 
-                    target = getAngle() + turnTarget;
-                    error = target - getAngle();
+                    turnTarget = getAngle() + turnTarget;
+                    error = turnTarget - getAngle();
 
                     correction = pidController.update(error);
 
@@ -293,9 +326,15 @@ public class Drive { //needs to extend subsystem at some point
 
     // linear movements
 
-    public void moveForward(double inches){
-        inches = Ytarget;
-        autoMode = AutoMode.Y;
+    public void moveForward(){
+        //Ytarget = motorEncodersInchesToTicks(inches);
+        //robotPower = power;
+       // autoMode = AutoMode.Y;
+
+        motors[0].setPower(1);
+        motors[1].setPower(1);
+        motors[2].setPower(1);
+        motors[3].setPower(1);
     }
 
     public void moveBack(double inches){
@@ -315,12 +354,17 @@ public class Drive { //needs to extend subsystem at some point
 
 
     public boolean atYPosition(){
-        if (Math.abs(error) < YErrorTolerance){
+
+        return Math.abs(targetMotorPos - getCurrentPos()) < 14;
+
+        /*if (Math.abs(error) < YErrorTolerance){
             return true;
         }
         else{
             return false;
         }
+
+         */
     }
 
 
@@ -399,6 +443,21 @@ public class Drive { //needs to extend subsystem at some point
         double circumference = 2 * Math.PI * WHEEL_RADIUS;
         return (int) Math.round(inches * ticksPerRev / circumference);
     }
+
+    public int getCurrentPos(){
+        int motorZeroPos = motors[0].getCurrentPosition();
+        int motorOnePos = motors[1].getCurrentPosition();
+        int motorTwoPos = motors[2].getCurrentPosition();
+        int motorThreePos = motors[3].getCurrentPosition();
+        return (motorZeroPos + motorOnePos + motorTwoPos + motorThreePos) / 4;
+    }
+
+    public double getMotorZeroCurrentPos(){
+
+        return motors[0].getCurrentPosition();
+    }
+
+
 
 
     ///////////////////////////////////////Angle Corrector//////////////////////////////////////////
