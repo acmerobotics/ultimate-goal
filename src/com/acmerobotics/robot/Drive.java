@@ -1,10 +1,13 @@
 package com.acmerobotics.robot;
 
+import android.sax.StartElementListener;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.opmodes.teleop.DriveTest;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.robomatic.hardware.CachingSensor;
@@ -21,6 +24,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -104,9 +108,15 @@ public class Drive extends Subsystem{
         TURN
     }
 
-    private double Ytarget = 0;
+    public double Ytarget = 0;
     private double Xtarget = 0;
     private double turnTarget = 0;
+    public double correction;
+
+    private double robotPower;
+
+    private int targetPosition = 0;
+    private int targetMotorPos;
 
     public double correction0 = 0;
     public double correction1 = 0;
@@ -127,7 +137,6 @@ public class Drive extends Subsystem{
 
 
     private AutoMode autoMode = AutoMode.UNKNOWN;
-    private AutoMode lastAutoMode = AutoMode.UNKNOWN;
 
     private LinearOpMode opMode;
 
@@ -150,6 +159,7 @@ public class Drive extends Subsystem{
         for (int i=0; i<4;i++){
             motors[i] = robot.getMotor("m" + i);
         }
+
 
 
         if(!inTeleOp){
@@ -179,8 +189,8 @@ public class Drive extends Subsystem{
             motors[3].setDirection(DcMotorEx.Direction.REVERSE);
 
             for (int i = 0; i < 4; i++){
-                motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
+                motors[i].setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             }
 
         }
@@ -205,7 +215,6 @@ public class Drive extends Subsystem{
         telemetryData.addData("inTeleOp ", inTeleOp);
 
         telemetryData.addData("autoMode ", autoMode);
-
 
         if (!inTeleOp){
 
@@ -573,13 +582,7 @@ public class Drive extends Subsystem{
     }
 
     private boolean opModeEquals(String opMode){
-        if (String.valueOf(this.opMode).equals(opMode)){
-            return true;
-        }
-
-        else{
-            return false;
-        }
+        return String.valueOf(this.opMode).equals(opMode);
     }
 
 }
