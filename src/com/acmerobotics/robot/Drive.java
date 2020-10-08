@@ -4,6 +4,7 @@ import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.opmodes.teleop.DriveTest;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
 import com.acmerobotics.robomatic.hardware.CachingSensor;
@@ -27,7 +28,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Config
-public class Drive { //needs to extend subsystem at some point
+public class Drive extends Subsystem{
     //constants
     private static final double WHEEL_RADIUS = 2;
 
@@ -37,8 +38,6 @@ public class Drive { //needs to extend subsystem at some point
     //hardware devices
     public DcMotorEx[] motors = new DcMotorEx[4];
     public DcMotorEx omniTracker;
-    private CachingSensor imuSensor;
-    private Servo stoneServo;
 
     // motors and motor encoder variables
     private static double MAX_V = 30;
@@ -50,8 +49,8 @@ public class Drive { //needs to extend subsystem at some point
 
     // imu variables
     //Orientation lastAngle = new Orientation();
-    private BNO055IMU imu;
-    private Orientation lastAngle = new Orientation();
+    public CachingSensor imuSensor;
+    private double lastAngle = 0;
     private double globalAngle;
 
     // servo positions
@@ -88,7 +87,7 @@ public class Drive { //needs to extend subsystem at some point
 
     public double newPower;
 
-    private boolean inTeleOp = false;
+    public boolean inTeleOp = false;
 
     private PIDController pidController;
 
@@ -133,26 +132,23 @@ public class Drive { //needs to extend subsystem at some point
     private LinearOpMode opMode;
 
 
-    public Drive(HardwareMap hardwareMap, boolean inTeleOp){
-        //TODO: add Robot robot, linearopmode Opmode above
-        //super("Drive");
+    public Drive(Robot robot, LinearOpMode opMode){
+        super("Drive");
 
         this.opMode = opMode;
 
-        //stoneServo = robot.getServo("stoneServo");
+        if (opModeEquals("TeleOp") || opModeEquals("DriveTest")){
+            inTeleOp = true;
+        }
 
-        //BNO055IMUImpl imu = robot.getRevHubImu(0, new Robot.Orientation(Robot.Axis.POSITIVE_X, Robot.Axis.POSITIVE_Y, Robot.Axis.POSITIVE_Z)); // creates BN0055-IMU-Impl, imu orientation is remapped
-        //imuSensor = new CachingSensor<>(() -> imu.getAngularOrientation().firstAngle); // gets heading
-        //robot.registerCachingSensor(imuSensor); // adds imu to caching sensors, will then update the heading
+        BNO055IMUImpl imu = robot.getRevHubImu(0, new Robot.Orientation(Robot.Axis.POSITIVE_X, Robot.Axis.POSITIVE_Y, Robot.Axis.POSITIVE_Z)); // creates BN0055-IMU-Impl, imu orientation is remapped
+        imuSensor = new CachingSensor<>(() -> imu.getAngularOrientation().firstAngle); // gets heading
+        robot.registerCachingSensor(imuSensor); // adds imu to caching sensors, will then update the heading
 
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
-        parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
-        imu.initialize(parameters);
         pidController = new PIDController(P, I, D);
 
         for (int i=0; i<4;i++){
-            motors[i] = hardwareMap.get(DcMotorEx.class, "m" + i);
+            motors[i] = robot.getMotor("m" + i);
         }
 
 
@@ -193,16 +189,18 @@ public class Drive { //needs to extend subsystem at some point
     }
 
 
-    // @Override
-    public void update(){
-       // telemetryData.addData("m0 current pos ", motors[0].getCurrentPosition());
-       // telemetryData.addData("m0 power ", motors[0].getPower());
+    @Override
+    public void update(Canvas overlay){
+        imuSensor.update();
+        telemetryData.addData("m0 current pos ", motors[0].getCurrentPosition());
+        telemetryData.addData("m0 power ", motors[0].getPower());
 
-       // telemetryData.addData("heading (radians)", imuSensor.getValue());
-      //  telemetryData.addData("heading (degrees)", getAngle());
-      //  telemetryData.addData("inTeleOp ", inTeleOp);
+        telemetryData.addData("heading (radians)", imuSensor.getValue());
+        //telemetryData.addData("heading (degrees)", getAngle());
+        telemetryData.addData("heading imu (degrees)", Math.toDegrees((double) imuSensor.getValue()));
+        telemetryData.addData("inTeleOp ", inTeleOp);
 
-     //   telemetryData.addData("autoMode ", autoMode);
+        telemetryData.addData("autoMode ", autoMode);
 
 
         if (!inTeleOp){
@@ -440,10 +438,10 @@ public class Drive { //needs to extend subsystem at some point
 
     public double getAngle(){
 
-        //double angle = Math.toDegrees((float) imuSensor.getValue()); // radians to degrees
-        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double angle = Math.toDegrees((float) imuSensor.getValue()); // radians to degrees
+        //Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        double deltaAngle = angles.firstAngle - lastAngle.firstAngle;
+        double deltaAngle = angle - lastAngle;
 
         if (deltaAngle < -180)
             deltaAngle += 360;
@@ -452,7 +450,7 @@ public class Drive { //needs to extend subsystem at some point
 
         globalAngle += deltaAngle;
 
-        lastAngle = angles;
+        lastAngle = angle;
 
         return globalAngle;
 
@@ -523,18 +521,6 @@ public class Drive { //needs to extend subsystem at some point
         }
 
         motors[motorNum].setPower(newPower);
-    }
-
-
-    // servo
-    public void grab() {
-
-        stoneServo.setPosition(grabPosition);
-    }
-
-    public void release() {
-
-        stoneServo.setPosition(releasePosition);
     }
 
 
