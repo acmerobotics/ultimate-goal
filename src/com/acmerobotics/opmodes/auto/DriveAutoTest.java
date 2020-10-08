@@ -37,12 +37,12 @@ public class DriveAutoTest extends LinearOpMode {
 //
 //            Telemetry.addLine();
 //
-            Telemetry.addData("target", robot.drive.target);
+//            Telemetry.addData("target", robot.drive.target);
 //
-            Telemetry.addData("currentPos0", robot.drive.motors[0].getCurrentPosition());
-            Telemetry.addData("currentPos1", robot.drive.motors[1].getCurrentPosition());
-            Telemetry.addData("currentPos2", robot.drive.motors[2].getCurrentPosition());
-            Telemetry.addData("currentPos3", robot.drive.motors[3].getCurrentPosition());
+//            Telemetry.addData("currentPos0", robot.drive.motors[0].getCurrentPosition());
+//            Telemetry.addData("currentPos1", robot.drive.motors[1].getCurrentPosition());
+//            Telemetry.addData("currentPos2", robot.drive.motors[2].getCurrentPosition());
+//            Telemetry.addData("currentPos3", robot.drive.motors[3].getCurrentPosition());
 //
 //            Telemetry.addLine();
 //
@@ -62,20 +62,20 @@ public class DriveAutoTest extends LinearOpMode {
 //            Telemetry.addData("angle", robot.drive.getAngle());
 //
 
-            Telemetry.addData("heading (radians)",robot.drive.imuSensor.getValue());
+            //Telemetry.addData("heading (radians)",robot.drive.imuSensor.getValue());
             //telemetryData.addData("heading (degrees)", getAngle());
-            Telemetry.addData("heading imu (degrees)", Math.toDegrees((double) robot.drive.imuSensor.getValue()));
-            Telemetry.addData("inTeleOP", robot.drive.inTeleOp);
+            //Telemetry.addData("heading imu (degrees)", Math.toDegrees((double) robot.drive.imuSensor.getValue()));
+            //Telemetry.addData("inTeleOP", robot.drive.inTeleOp);
 
-            Telemetry.update();
+            //Telemetry.update();
 //
             if (gamepad1.y) {
                 robot.drive.moveForward(distance);
             }
 //
-//            if (gamepad1.x){
-//                robot.drive.turnRight(90);
-//            }
+            if (gamepad1.x){
+                robot.drive.turnRight(90);
+            }
 //
             if (gamepad1.a) {
                 robot.drive.motors[0].setPower(0.5);

@@ -191,13 +191,17 @@ public class Drive extends Subsystem{
 
     @Override
     public void update(Canvas overlay){
-        imuSensor.update();
-        telemetryData.addData("m0 current pos ", motors[0].getCurrentPosition());
+        telemetryData.addData("currentPos0", motors[0].getCurrentPosition());
+        telemetryData.addData("currentPos1", motors[1].getCurrentPosition());
+        telemetryData.addData("currentPos2", -motors[2].getCurrentPosition());
+        telemetryData.addData("currentPos3", -motors[3].getCurrentPosition());
+
+        telemetryData.addData("target", target);
         telemetryData.addData("m0 power ", motors[0].getPower());
 
         telemetryData.addData("heading (radians)", imuSensor.getValue());
-        //telemetryData.addData("heading (degrees)", getAngle());
-        telemetryData.addData("heading imu (degrees)", Math.toDegrees((double) imuSensor.getValue()));
+        telemetryData.addData("heading (degrees)", getAngle());
+        telemetryData.addData("heading imu (degrees)", Math.toDegrees((Double.parseDouble(imuSensor.getValue().toString()))) );
         telemetryData.addData("inTeleOp ", inTeleOp);
 
         telemetryData.addData("autoMode ", autoMode);
@@ -212,15 +216,14 @@ public class Drive extends Subsystem{
 
             switch (autoMode){
                 case UNKNOWN:
-
-                    // create variables that will be used in other cases
+                    break;
 
                 case Y:
 
                     error0 = target - motors[0].getCurrentPosition();
                     error1 = target - motors[1].getCurrentPosition();
-                    error2 = target - motors[2].getCurrentPosition();
-                    error3 = target - motors[3].getCurrentPosition();
+                    error2 = target - -motors[2].getCurrentPosition();
+                    error3 = target - -motors[3].getCurrentPosition();
 
                     correction0 = pidController.update(error0);
                     correction1 = pidController.update(error1);
@@ -246,8 +249,8 @@ public class Drive extends Subsystem{
 
                     error0 = target - motors[0].getCurrentPosition();  // strafeCurrentPosition()
                     error1 = -target - motors[1].getCurrentPosition();
-                    error2 = target - motors[2].getCurrentPosition();
-                    error3 = -target - motors[3].getCurrentPosition();
+                    error2 = target - -motors[2].getCurrentPosition();
+                    error3 = -target - -motors[3].getCurrentPosition();
 
                     correction0 = pidController.update(error0);
                     correction1 = pidController.update(error1);
@@ -438,7 +441,7 @@ public class Drive extends Subsystem{
 
     public double getAngle(){
 
-        double angle = Math.toDegrees((float) imuSensor.getValue()); // radians to degrees
+        double angle = Math.toDegrees((Double.parseDouble(imuSensor.getValue().toString()))); // radians to degrees
         //Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         double deltaAngle = angle - lastAngle;
