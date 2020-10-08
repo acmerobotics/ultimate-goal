@@ -21,7 +21,10 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Config
 public class Drive { //needs to extend subsystem at some point
@@ -48,7 +51,7 @@ public class Drive { //needs to extend subsystem at some point
     // imu variables
     //Orientation lastAngle = new Orientation();
     private BNO055IMU imu;
-    private double lastAngle;
+    private Orientation lastAngle = new Orientation();
     private double globalAngle;
 
     // servo positions
@@ -78,14 +81,18 @@ public class Drive { //needs to extend subsystem at some point
     public double Pcoefficient = 0.1; // 0.2
     public static double PcoefficientTurn = 0.04;
 
-    public double error;
+    public double error0;
+    public double error1;
+    public double error2;
+    public double error3;
+
     public double newPower;
 
     private boolean inTeleOp = false;
 
     private PIDController pidController;
 
-    public static double P = 0;
+    public static double P = 0.005;
     public static double I = 0;
     public static double D = 0;
 
@@ -102,7 +109,18 @@ public class Drive { //needs to extend subsystem at some point
     private double Xtarget = 0;
     private double turnTarget = 0;
 
-    // should be changed if needed (in inches might change to ticks if needed)
+    public double correction0 = 0;
+    public double correction1 = 0;
+    public double correction2 = 0;
+    public double correction3 = 0;
+
+    public double target = 0;
+
+    public boolean canSetYTarget = true;
+    public boolean canSetXTarget = true;
+    public boolean canSetTurnTarget = true;
+
+    // should be changed if needed (in ticks)
     private double YErrorTolerance = 3;
     private double XErrorTolerance = 5;
     private double headingErrorTolerance = 5;
@@ -148,6 +166,7 @@ public class Drive { //needs to extend subsystem at some point
             motors[3].setDirection(DcMotorEx.Direction.FORWARD);
 
             for (int i = 0; i < 4; i++){
+                motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motors[i].setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
                 motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             }
@@ -175,7 +194,7 @@ public class Drive { //needs to extend subsystem at some point
 
 
     // @Override
-    public void update(Canvas overlay){
+    public void update(){
        // telemetryData.addData("m0 current pos ", motors[0].getCurrentPosition());
        // telemetryData.addData("m0 power ", motors[0].getPower());
 
@@ -197,19 +216,24 @@ public class Drive { //needs to extend subsystem at some point
                 case UNKNOWN:
 
                     // create variables that will be used in other cases
-                    double target;
-                    double correction;
 
                 case Y:
 
-                    target = motors[0].getCurrentPosition() + Ytarget;
-                    error = target - motors[0].getCurrentPosition();
+                    error0 = target - motors[0].getCurrentPosition();
+                    error1 = target - motors[1].getCurrentPosition();
+                    error2 = target - motors[2].getCurrentPosition();
+                    error3 = target - motors[3].getCurrentPosition();
 
-                    correction = pidController.update(error);
+                    correction0 = pidController.update(error0);
+                    correction1 = pidController.update(error1);
+                    correction2 = pidController.update(error2);
+                    correction3 = pidController.update(error3);
 
-                    for (int i= 0; i < 4; i++) {
-                        motors[i].setPower(correction);
-                    }
+                    motors[0].setPower(correction0);
+                    motors[1].setPower(correction1);
+                    motors[2].setPower(correction2);
+                    motors[3].setPower(correction3);
+
 
                     break;
 
@@ -218,31 +242,40 @@ public class Drive { //needs to extend subsystem at some point
 
 
                     // TODO add strafe alignment correction
+                    // TODO add functionality with omni wheel
                     // the target and error are based on motors 0 and 2 but the values and the same
                     // for motors 1 and 3 but opposite sign
-                    target = strafeCurrentPosition() + Xtarget;
-                    error = target - strafeCurrentPosition();
 
-                    correction = pidController.update(error);
+                    error0 = target - motors[0].getCurrentPosition();  // strafeCurrentPosition()
+                    error1 = -target - motors[1].getCurrentPosition();
+                    error2 = target - motors[2].getCurrentPosition();
+                    error3 = -target - motors[3].getCurrentPosition();
 
-                    motors[0].setPower(correction);
-                    motors[1].setPower(-correction);
-                    motors[2].setPower(correction);
-                    motors[3].setPower(-correction);
+                    correction0 = pidController.update(error0);
+                    correction1 = pidController.update(error1);
+                    correction2 = pidController.update(error2);
+                    correction3 = pidController.update(error3);
+
+                    motors[0].setPower(correction0);
+                    motors[1].setPower(correction1);
+                    motors[2].setPower(correction2);
+                    motors[3].setPower(correction3);
 
                     break;
 
                 case TURN:
 
-                    target = getAngle() + turnTarget;
-                    error = target - getAngle();
+                    error0 = target - getAngle();
 
-                    correction = pidController.update(error);
+                    correction0 = pidController.update(error0);
+                    correction1 = pidController.update(error0);
+                    correction2 = pidController.update(error0);
+                    correction3 = pidController.update(error0);
 
-                    motors[0].setPower(correction);
-                    motors[1].setPower(correction);
-                    motors[2].setPower(-correction);
-                    motors[3].setPower(-correction);
+                    motors[0].setPower(-correction0);
+                    motors[1].setPower(-correction0);
+                    motors[2].setPower(correction0);
+                    motors[3].setPower(correction0);
 
                     break;
 
@@ -294,28 +327,52 @@ public class Drive { //needs to extend subsystem at some point
     // linear movements
 
     public void moveForward(double inches){
-        inches = Ytarget;
+        Ytarget = motorEncodersInchesToTicks(inches);
+
+        if (canSetYTarget) {
+            target = motors[0].getCurrentPosition() + Ytarget;
+            canSetYTarget = false;
+        }
+
         autoMode = AutoMode.Y;
     }
 
     public void moveBack(double inches){
-        Ytarget = -inches;
+        Ytarget = motorEncodersInchesToTicks(-inches);
+
+        if (canSetYTarget) {
+            target = motors[0].getCurrentPosition() + Ytarget;
+            canSetYTarget = false;
+        }
+
         autoMode = AutoMode.Y;
     }
 
     public void strafeRight(double inches){
-        Xtarget = inches;
+        Xtarget = motorEncodersInchesToTicks(inches); // strafeCurrentPosition() // omni encoder ticks to inches
+
+        if (canSetXTarget) {
+            target = motors[0].getCurrentPosition() + Xtarget;
+            canSetXTarget = false;
+        }
         autoMode = AutoMode.STRAFE;
     }
 
     public void strafeLeft(double inches){
-        Xtarget = -inches;
+        Xtarget = motorEncodersInchesToTicks(-inches); // strafeCurrentPosition() // omni encoder ticks to inches
+
+        if (canSetXTarget) {
+            target = motors[0].getCurrentPosition() + Xtarget;
+            canSetXTarget = false;
+        }
+
         autoMode = AutoMode.STRAFE;
     }
 
 
     public boolean atYPosition(){
-        if (Math.abs(error) < YErrorTolerance){
+        if (Math.abs(error0) < YErrorTolerance){
+            canSetYTarget = true;
             return true;
         }
         else{
@@ -325,7 +382,8 @@ public class Drive { //needs to extend subsystem at some point
 
 
     public boolean atStrafePosition(){
-        if (Math.abs(error) < XErrorTolerance){
+        if (Math.abs(error0) < XErrorTolerance){
+            canSetXTarget = true;
             return true;
         }
         else{
@@ -340,19 +398,32 @@ public class Drive { //needs to extend subsystem at some point
 
     // turning
 
-    public void turnRight(double degrees){
+    public void turnLeft(double degrees){
         turnTarget = degrees;
+
+        if (canSetTurnTarget) {
+            target = getAngle() + turnTarget;
+            canSetTurnTarget = false;
+        }
+
         autoMode = AutoMode.TURN;
     }
 
-    public void turnLeft(double degrees){
+    public void turnRight(double degrees){
         turnTarget = -degrees;
+
+        if (canSetTurnTarget) {
+            target = getAngle() + turnTarget;
+            canSetTurnTarget = false;
+        }
+
         autoMode = AutoMode.TURN;
     }
 
 
     public boolean atTurningPosition() {
-        if (Math.abs(error) < headingErrorTolerance) {
+        if (Math.abs(error0) < headingErrorTolerance) {
+            canSetTurnTarget = true;
             return true;
         } else {
             return false;
@@ -361,7 +432,7 @@ public class Drive { //needs to extend subsystem at some point
 
     public void resetAngle(){
 
-        lastAngle = Math.toDegrees((float) imuSensor.getValue());
+        //lastAngle = Math.toDegrees((float) imuSensor.getValue());
 
         globalAngle = 0;
 
@@ -369,9 +440,10 @@ public class Drive { //needs to extend subsystem at some point
 
     public double getAngle(){
 
-        double angle = Math.toDegrees((float) imuSensor.getValue()); // radians to degrees
+        //double angle = Math.toDegrees((float) imuSensor.getValue()); // radians to degrees
+        Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
-        double deltaAngle = angle - lastAngle;
+        double deltaAngle = angles.firstAngle - lastAngle.firstAngle;
 
         if (deltaAngle < -180)
             deltaAngle += 360;
@@ -380,15 +452,12 @@ public class Drive { //needs to extend subsystem at some point
 
         globalAngle += deltaAngle;
 
-        lastAngle = angle;
+        lastAngle = angles;
 
         return globalAngle;
 
     }
 
-    public double getCurrentAngle(){
-        return globalAngle;
-    }
 
     private int omniEncodersInchesToTicks(int inches) {
         double circumference = 2 * Math.PI * TRACKER_RADIUS;
@@ -397,7 +466,7 @@ public class Drive { //needs to extend subsystem at some point
 
     private int motorEncodersInchesToTicks(double inches) {
         double circumference = 2 * Math.PI * WHEEL_RADIUS;
-        return (int) Math.round(inches * ticksPerRev / circumference);
+        return (int) Math.floor(inches * ticksPerRev / circumference);
     }
 
 
@@ -409,18 +478,18 @@ public class Drive { //needs to extend subsystem at some point
 
 
     private void setError(){
-        error = getAngle();
+        error0 = getAngle();
     }
 
 
     private double Pcontroller(){
-        double output = Pcoefficient * error;
+        double output = Pcoefficient * error0;
         return output;
     }
 
 
     private double PcontrollerTurn(){
-        return PcoefficientTurn * error;
+        return PcoefficientTurn * error0;
     }
 
 
