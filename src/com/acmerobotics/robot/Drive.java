@@ -111,12 +111,6 @@ public class Drive extends Subsystem{
     public double Ytarget = 0;
     private double Xtarget = 0;
     private double turnTarget = 0;
-    public double correction;
-
-    private double robotPower;
-
-    private int targetPosition = 0;
-    private int targetMotorPos;
 
     public double correction0 = 0;
     public double correction1 = 0;
@@ -130,9 +124,9 @@ public class Drive extends Subsystem{
     public boolean canSetTurnTarget = true;
 
     // should be changed if needed (in ticks)
-    private double YErrorTolerance = 3;
-    private double XErrorTolerance = 5;
-    private double headingErrorTolerance = 5;
+    public static double YErrorTolerance = 3;
+    public static double XErrorTolerance = 5;
+    public static double headingErrorTolerance = 5;
 
 
 
