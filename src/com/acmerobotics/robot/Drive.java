@@ -201,9 +201,7 @@ public class Drive extends Subsystem{
         telemetryData.addData("target", target);
         telemetryData.addData("m0 power ", motors[0].getPower());
 
-        telemetryData.addData("heading (radians)", imuSensor.getValue());
         telemetryData.addData("heading (degrees)", getAngle());
-        telemetryData.addData("heading imu (degrees)", Math.toDegrees((Double.parseDouble(imuSensor.getValue().toString()))) );
         telemetryData.addData("inTeleOp ", inTeleOp);
 
         telemetryData.addData("autoMode ", autoMode);
@@ -442,7 +440,15 @@ public class Drive extends Subsystem{
 
     public double getAngle(){
 
-        double angle = Math.toDegrees((Double.parseDouble(imuSensor.getValue().toString()))); // radians to degrees
+        double angle;
+
+        if (imuSensor.getValue() != null){
+            angle = Math.toDegrees((Double.parseDouble(imuSensor.getValue().toString()))); // radians to degrees
+        }
+        else {
+            angle = lastAngle;
+        }
+
         //Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
         double deltaAngle = angle - lastAngle;
