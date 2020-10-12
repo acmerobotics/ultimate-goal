@@ -3,16 +3,17 @@ package com.acmerobotics.util;
 import com.acmerobotics.robomatic.config.OpmodeConfiguration;
 
 @OpmodeConfiguration
-public class TestConfig {
+public class Configuration {
 
-    public enum AllianceColor {
-        RED,
+    public enum AllianceColor{
         BLUE,
+        RED
     }
 
     public AllianceColor color;
 
-    public enum StartLocation {
+
+    public enum StartLocation{
         A,
         B
     }

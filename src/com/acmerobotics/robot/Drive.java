@@ -53,13 +53,9 @@ public class Drive extends Subsystem{
 
     // imu variables
     //Orientation lastAngle = new Orientation();
-    public CachingSensor imuSensor;
+    private CachingSensor imuSensor;
     private double lastAngle = 0;
     private double globalAngle;
-
-    // servo positions
-    private double grabPosition = 0.75;
-    private double releasePosition = 0.20;
 
     // vector/pos variables
     private static Vector2d[] WHEEL_POSITIONS = {
@@ -91,11 +87,11 @@ public class Drive extends Subsystem{
 
     public double newPower;
 
-    private boolean inTeleOp = false;
+    private boolean inTeleOp;
 
     private PIDController pidController;
 
-    public static double P = 0.005;
+    public static double P = 0.004;
     public static double I = 0;
     public static double D = 0;
 
@@ -108,7 +104,7 @@ public class Drive extends Subsystem{
         TURN
     }
 
-    public double Ytarget = 0;
+    private double Ytarget = 0;
     private double Xtarget = 0;
     private double turnTarget = 0;
 
@@ -124,7 +120,7 @@ public class Drive extends Subsystem{
     public boolean canSetTurnTarget = true;
 
     // should be changed if needed (in ticks)
-    public static double YErrorTolerance = 3;
+    public static double YErrorTolerance = 5;
     public static double XErrorTolerance = 5;
     public static double headingErrorTolerance = 5;
 
@@ -215,6 +211,10 @@ public class Drive extends Subsystem{
 
             switch (autoMode){
                 case UNKNOWN:
+                    motors[0].setPower(0);
+                    motors[1].setPower(0);
+                    motors[2].setPower(0);
+                    motors[3].setPower(0);
                     break;
 
                 case Y:
@@ -234,12 +234,10 @@ public class Drive extends Subsystem{
                     motors[2].setPower(correction2);
                     motors[3].setPower(correction3);
 
-
                     break;
 
 
                 case STRAFE:
-
 
                     // TODO add strafe alignment correction
                     // TODO add functionality with omni wheel
@@ -247,9 +245,9 @@ public class Drive extends Subsystem{
                     // for motors 1 and 3 but opposite sign
 
                     error0 = target - motors[0].getCurrentPosition();  // strafeCurrentPosition()
-                    error1 = -target - motors[1].getCurrentPosition();
+                    error1 = -target + motors[1].getCurrentPosition();
                     error2 = target - -motors[2].getCurrentPosition();
-                    error3 = -target - -motors[3].getCurrentPosition();
+                    error3 = -target + -motors[3].getCurrentPosition();
 
                     correction0 = pidController.update(error0);
                     correction1 = pidController.update(error1);
@@ -257,9 +255,9 @@ public class Drive extends Subsystem{
                     correction3 = pidController.update(error3);
 
                     motors[0].setPower(correction0);
-                    motors[1].setPower(correction1);
+                    motors[1].setPower(-correction0);
                     motors[2].setPower(correction2);
-                    motors[3].setPower(correction3);
+                    motors[3].setPower(-correction2);
 
                     break;
 
@@ -331,6 +329,7 @@ public class Drive extends Subsystem{
 
         if (canSetYTarget) {
             target = motors[0].getCurrentPosition() + Ytarget;
+            error0 = target;
             canSetYTarget = false;
         }
 
@@ -342,6 +341,7 @@ public class Drive extends Subsystem{
 
         if (canSetYTarget) {
             target = motors[0].getCurrentPosition() + Ytarget;
+            error0 = target;
             canSetYTarget = false;
         }
 
@@ -353,6 +353,7 @@ public class Drive extends Subsystem{
 
         if (canSetXTarget) {
             target = motors[0].getCurrentPosition() + Xtarget;
+            error0 = target;
             canSetXTarget = false;
         }
         autoMode = AutoMode.STRAFE;
@@ -363,6 +364,7 @@ public class Drive extends Subsystem{
 
         if (canSetXTarget) {
             target = motors[0].getCurrentPosition() + Xtarget;
+            error0 = target;
             canSetXTarget = false;
         }
 
@@ -371,18 +373,20 @@ public class Drive extends Subsystem{
 
 
     public boolean atYPosition(){
-        if (Math.abs(error0) < YErrorTolerance){
-            canSetYTarget = true;
+
+        if (Math.abs(error0) < YErrorTolerance) {
+            error0 = YErrorTolerance;
+            canSetXTarget = true;
             return true;
-        }
-        else{
+        } else {
             return false;
-        }
+            }
     }
 
 
     public boolean atStrafePosition(){
         if (Math.abs(error0) < XErrorTolerance){
+            error0 = YErrorTolerance;
             canSetXTarget = true;
             return true;
         }
@@ -403,6 +407,7 @@ public class Drive extends Subsystem{
 
         if (canSetTurnTarget) {
             target = getAngle() + turnTarget;
+            error0 = target;
             canSetTurnTarget = false;
         }
 
@@ -411,9 +416,11 @@ public class Drive extends Subsystem{
 
     public void turnRight(double degrees){
         turnTarget = -degrees;
+        telemetryData.addData("tutnRight", true);
 
         if (canSetTurnTarget) {
             target = getAngle() + turnTarget;
+            error0 = target;
             canSetTurnTarget = false;
         }
 
@@ -424,6 +431,7 @@ public class Drive extends Subsystem{
     public boolean atTurningPosition() {
         if (Math.abs(error0) < headingErrorTolerance) {
             canSetTurnTarget = true;
+            error0 = headingErrorTolerance;
             return true;
         } else {
             return false;
@@ -551,6 +559,7 @@ public class Drive extends Subsystem{
     }
 
     public void stopMotors(){
+        autoMode = AutoMode.UNKNOWN;
         motors[0].setPower(0);
         motors[1].setPower(0);
         motors[2].setPower(0);
