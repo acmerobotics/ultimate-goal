@@ -90,12 +90,15 @@ public class Drive extends Subsystem{
     private boolean inTeleOp;
 
     private PIDController pidController;
+    private PIDController turnPidController;
 
-    public static double P = 0.004;
+    public static double P = 0.005;
     public static double I = 0;
     public static double D = 0;
 
-    // event triggers
+    public static double tP = 0.01;
+    public static double tI = 0;
+    public static double tD = 0;
 
     private enum AutoMode{
         UNKNOWN,
@@ -114,10 +117,6 @@ public class Drive extends Subsystem{
     public double correction3 = 0;
 
     public double target = 0;
-
-    public boolean canSetYTarget = true;
-    public boolean canSetXTarget = true;
-    public boolean canSetTurnTarget = true;
 
     // should be changed if needed (in ticks)
     public static double YErrorTolerance = 5;
@@ -143,6 +142,7 @@ public class Drive extends Subsystem{
         robot.registerCachingSensor(imuSensor); // adds imu to caching sensors, will then update the heading
 
         pidController = new PIDController(P, I, D);
+        turnPidController = new PIDController(tP, tI, tD);
 
         for (int i=0; i<4;i++){
             motors[i] = robot.getMotor("m" + i);
@@ -161,7 +161,7 @@ public class Drive extends Subsystem{
 
             for (int i = 0; i < 4; i++){
                 motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                motors[i].setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
                 motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
             }
 
@@ -207,6 +207,7 @@ public class Drive extends Subsystem{
             // adjust error for a motor power
             //error = error /  12; // might move this statement to a method
             pidController.setOutputBounds(-1, 1);
+            turnPidController.setOutputBounds(-1, 1);
 
 
             switch (autoMode){
@@ -245,9 +246,9 @@ public class Drive extends Subsystem{
                     // for motors 1 and 3 but opposite sign
 
                     error0 = target - motors[0].getCurrentPosition();  // strafeCurrentPosition()
-                    error1 = -target + motors[1].getCurrentPosition();
+                    error1 = -target - motors[1].getCurrentPosition();
                     error2 = target - -motors[2].getCurrentPosition();
-                    error3 = -target + -motors[3].getCurrentPosition();
+                    error3 = -target - -motors[3].getCurrentPosition();
 
                     correction0 = pidController.update(error0);
                     correction1 = pidController.update(error1);
@@ -255,9 +256,9 @@ public class Drive extends Subsystem{
                     correction3 = pidController.update(error3);
 
                     motors[0].setPower(correction0);
-                    motors[1].setPower(-correction0);
+                    motors[1].setPower(correction1);
                     motors[2].setPower(correction2);
-                    motors[3].setPower(-correction2);
+                    motors[3].setPower(correction3);
 
                     break;
 
@@ -265,10 +266,7 @@ public class Drive extends Subsystem{
 
                     error0 = target - getAngle();
 
-                    correction0 = pidController.update(error0);
-                    correction1 = pidController.update(error0);
-                    correction2 = pidController.update(error0);
-                    correction3 = pidController.update(error0);
+                    correction0 = turnPidController.update(error0);
 
                     motors[0].setPower(-correction0);
                     motors[1].setPower(-correction0);
@@ -327,11 +325,10 @@ public class Drive extends Subsystem{
     public void moveForward(double inches){
         Ytarget = motorEncodersInchesToTicks(inches);
 
-        if (canSetYTarget) {
-            target = motors[0].getCurrentPosition() + Ytarget;
-            error0 = target;
-            canSetYTarget = false;
-        }
+        prepareMotors();
+
+        target = Ytarget; // motors[0].getCurrentPosition() + Ytarget;
+        error0 = YErrorTolerance;
 
         autoMode = AutoMode.Y;
     }
@@ -339,11 +336,10 @@ public class Drive extends Subsystem{
     public void moveBack(double inches){
         Ytarget = motorEncodersInchesToTicks(-inches);
 
-        if (canSetYTarget) {
-            target = motors[0].getCurrentPosition() + Ytarget;
-            error0 = target;
-            canSetYTarget = false;
-        }
+        prepareMotors();
+
+        target = Ytarget; //motors[0].getCurrentPosition() + Ytarget;
+        error0 = YErrorTolerance;
 
         autoMode = AutoMode.Y;
     }
@@ -351,22 +347,21 @@ public class Drive extends Subsystem{
     public void strafeRight(double inches){
         Xtarget = motorEncodersInchesToTicks(inches); // strafeCurrentPosition() // omni encoder ticks to inches
 
-        if (canSetXTarget) {
-            target = motors[0].getCurrentPosition() + Xtarget;
-            error0 = target;
-            canSetXTarget = false;
-        }
+        prepareMotors();
+
+        target = Xtarget; // motors[0].getCurrentPosition() + Xtarget;
+        error0 = XErrorTolerance;
+
         autoMode = AutoMode.STRAFE;
     }
 
     public void strafeLeft(double inches){
         Xtarget = motorEncodersInchesToTicks(-inches); // strafeCurrentPosition() // omni encoder ticks to inches
 
-        if (canSetXTarget) {
-            target = motors[0].getCurrentPosition() + Xtarget;
-            error0 = target;
-            canSetXTarget = false;
-        }
+        prepareMotors();
+
+        target = Xtarget; // motors[0].getCurrentPosition() + Xtarget;
+        error0 = XErrorTolerance;
 
         autoMode = AutoMode.STRAFE;
     }
@@ -376,7 +371,6 @@ public class Drive extends Subsystem{
 
         if (Math.abs(error0) < YErrorTolerance) {
             error0 = YErrorTolerance;
-            canSetXTarget = true;
             return true;
         } else {
             return false;
@@ -386,8 +380,7 @@ public class Drive extends Subsystem{
 
     public boolean atStrafePosition(){
         if (Math.abs(error0) < XErrorTolerance){
-            error0 = YErrorTolerance;
-            canSetXTarget = true;
+            error0 = XErrorTolerance;
             return true;
         }
         else{
@@ -405,24 +398,21 @@ public class Drive extends Subsystem{
     public void turnLeft(double degrees){
         turnTarget = degrees;
 
-        if (canSetTurnTarget) {
-            target = getAngle() + turnTarget;
-            error0 = target;
-            canSetTurnTarget = false;
-        }
+        prepareMotors();
+
+        target = getAngle() + turnTarget;
+        error0 = headingErrorTolerance;
 
         autoMode = AutoMode.TURN;
     }
 
     public void turnRight(double degrees){
         turnTarget = -degrees;
-        telemetryData.addData("tutnRight", true);
 
-        if (canSetTurnTarget) {
-            target = getAngle() + turnTarget;
-            error0 = target;
-            canSetTurnTarget = false;
-        }
+        prepareMotors();
+
+        target = getAngle() + turnTarget;
+        error0 = headingErrorTolerance;
 
         autoMode = AutoMode.TURN;
     }
@@ -430,7 +420,6 @@ public class Drive extends Subsystem{
 
     public boolean atTurningPosition() {
         if (Math.abs(error0) < headingErrorTolerance) {
-            canSetTurnTarget = true;
             error0 = headingErrorTolerance;
             return true;
         } else {
@@ -595,6 +584,13 @@ public class Drive extends Subsystem{
         int hasTeleOp = opMode.indexOf("teleop");
 
         return hasTeleOp != -1;
+    }
+
+    private void prepareMotors(){
+        for (int i = 0; i < 4; i++){
+            motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+        }
     }
 
 }
