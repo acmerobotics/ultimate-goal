@@ -1,5 +1,7 @@
 package com.acmerobotics.opmodes;
 
+import android.util.Log;
+
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -7,6 +9,8 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+
+import java.util.ArrayList;
 
 /*
 the freeFlywheelSpeed will be the speed of the flywheel spinning at full power without any obstructions.
@@ -28,13 +32,14 @@ public class LauncherPrototype extends LinearOpMode {
     public static double motorTargetVelocityRPM = 0; //dashboard configurable
     public static double freeFlywheelSpeed = 0; //dashboard configurable
     public static double flywheelLaunchThreshold = 0; //dashboard configurable
+    private int loopsAboveThreshold=0;
 
     public double currentAccelMotorVelocityRPM;
     public double currentShooterMotorVelocityRPM;
     public double averageMotorVelocityRPM;
 
     private String flywheelStatus;
-    private double[] speedResetTimes = {};
+    private ArrayList<Double> speedResetTimes = new ArrayList<>();
 
     @Override
     public void runOpMode(){
@@ -66,13 +71,21 @@ public class LauncherPrototype extends LinearOpMode {
             averageMotorVelocityRPM = (currentAccelMotorVelocityRPM + currentShooterMotorVelocityRPM) /2;
 
             if(Math.abs(freeFlywheelSpeed-averageMotorVelocityRPM) >= flywheelLaunchThreshold || flywheelStatus.equals("Speeding Up")) {
-                 flywheelSpinTime.reset();
+
+                if(flywheelStatus.equals("Ready to Launch")){
+                    flywheelSpinTime.reset();
+                }
+
                  flywheelStatus = "Speeding Up";
 
                  if(Math.abs(freeFlywheelSpeed-averageMotorVelocityRPM) <= flywheelLaunchThreshold) {
-                     flywheelStatus = "Ready to Launch";
-
-                     speedResetTimes[speedResetTimes.length] = flywheelSpinTime.milliseconds();
+                     loopsAboveThreshold++;
+                     if(loopsAboveThreshold >= 5){
+                         Log.i("Flywheel Reset", String.valueOf(flywheelSpinTime.milliseconds()));
+                         flywheelStatus = "Ready to Launch";
+                         loopsAboveThreshold = 0;
+                         speedResetTimes.add(flywheelSpinTime.milliseconds());
+                     }
                  }
             }
 
@@ -80,15 +93,15 @@ public class LauncherPrototype extends LinearOpMode {
             dashboardTelementry.addData("currentShooterMotorSpeed: ", currentShooterMotorVelocityRPM);
             dashboardTelementry.addData("Flywheel Status: ", flywheelStatus);
             dashboardTelementry.update();
+
+            Log.i("Average Motor Speed", String.valueOf(averageMotorVelocityRPM));
         }
         //outputting Flywheel Reset Times
-        double averageResetTime = speedResetTimes[0];
-        for(int i=1; i < speedResetTimes.length; i++) {
-            averageResetTime = (averageResetTime + speedResetTimes[i]) / 2;
+        double averageResetTime = speedResetTimes.get(0);
+        for(int i=1; i < speedResetTimes.size(); i++) {
+            averageResetTime = (averageResetTime + speedResetTimes.get(i)) / 2;
         }
-
-        dashboardTelementry.addData("Average Shooter Reset Time: ", averageResetTime);
-        dashboardTelementry.update();
+        Log.i("Average Reset Speed", String.valueOf(averageResetTime));
     }
 
 
