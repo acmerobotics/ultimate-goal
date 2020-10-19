@@ -4,8 +4,10 @@ import android.util.Log;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.util.RPMTool;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
@@ -24,12 +26,12 @@ This will be used to test the time it takes from shooting to ready to shoot agai
 public class LauncherPrototype extends LinearOpMode {
 
     private double motorGearReduction = 4.0;
-    private double LauncherGearReduction =1.0/6.0;
+    private double LauncherGearReduction =1.0;
     private double flywheelGearReduction = motorGearReduction * LauncherGearReduction;
     public double ticksPerRevolution = 7 * flywheelGearReduction;
 
     public static double motorPower = 1; //dashboard configurable
-    public static double motorTargetVelocityRPM = 0; //dashboard configurable
+    //public static double motorTargetVelocityRPM = 0; //dashboard configurable
     public static double freeFlywheelSpeed = 0; //dashboard configurable
     public static double flywheelLaunchThreshold = 0; //dashboard configurable
     private int loopsAboveThreshold=0;
@@ -47,27 +49,28 @@ public class LauncherPrototype extends LinearOpMode {
         Telemetry dashboardTelementry = dashboard.getTelemetry();
 
         ElapsedTime flywheelSpinTime = new ElapsedTime();
+        flywheelStatus = "Speeding Up";
 
-        DcMotorEx launcherAccelMotor = hardwareMap.get(DcMotorEx.class,"accelMotor");
-        DcMotorEx launcherShooterMotor = hardwareMap.get(DcMotorEx.class,"shooterMotor");
-        launcherAccelMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER); //PID controlled velocity
-        launcherShooterMotor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER); //PID controlled velocity
+        DcMotor launcherAccelMotor = hardwareMap.get(DcMotor.class,"accelMotor");
+        DcMotor launcherShooterMotor = hardwareMap.get(DcMotor.class,"shooterMotor");
+        launcherAccelMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //PID controlled velocity
+        launcherShooterMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER); //PID controlled velocity
+        launcherAccelMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        launcherShooterMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        RPMTool accelMotorRPMTool = new RPMTool(launcherAccelMotor,ticksPerRevolution);
+        RPMTool shooterMotorRPMTool = new RPMTool(launcherShooterMotor,ticksPerRevolution);
 
         waitForStart();
 
         while (!isStopRequested()) {
             //set motorPower to 1 in dashboard to test the max rmp of the launcher, then set motorPower to 0 and set rpms for velocity PID
-            if(motorPower != 0){
-                launcherAccelMotor.setPower(motorPower);
-                launcherShooterMotor.setPower(motorPower);
-            }
-            else {
-                launcherAccelMotor.setVelocity(motorTargetVelocityRPM * (ticksPerRevolution / 60));
-                launcherShooterMotor.setVelocity(motorTargetVelocityRPM * (ticksPerRevolution / 60));
-            }
 
-            currentAccelMotorVelocityRPM = launcherAccelMotor.getVelocity() * (60 / ticksPerRevolution);
-            currentShooterMotorVelocityRPM = launcherShooterMotor.getVelocity() * (60 / ticksPerRevolution);
+            launcherAccelMotor.setPower(motorPower);
+            launcherShooterMotor.setPower(motorPower);
+
+            currentAccelMotorVelocityRPM = accelMotorRPMTool.getRPM();
+            currentShooterMotorVelocityRPM = shooterMotorRPMTool.getRPM();
             averageMotorVelocityRPM = (currentAccelMotorVelocityRPM + currentShooterMotorVelocityRPM) /2;
 
             if(Math.abs(freeFlywheelSpeed-averageMotorVelocityRPM) >= flywheelLaunchThreshold || flywheelStatus.equals("Speeding Up")) {
