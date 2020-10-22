@@ -77,20 +77,19 @@ public class Drive extends Subsystem{
     private double wheelOmega = 0;
 
     // correction variables
-    public double Pcoefficient = 0.1; // 0.2
-    public static double PcoefficientTurn = 0.04;
 
     public double error0;
     public double error1;
     public double error2;
     public double error3;
 
-    public double newPower;
 
     private boolean inTeleOp;
 
     private PIDController pidController;
     private PIDController turnPidController;
+    private PIDController strafePidController;
+    private PIDController correctionPidController;
 
     public static double P = 0.005;
     public static double I = 0;
@@ -99,6 +98,14 @@ public class Drive extends Subsystem{
     public static double tP = 0.01;
     public static double tI = 0;
     public static double tD = 0;
+
+    public static double sP = 0.00045;
+    public static double sI = 0;
+    public static double sD = 0.00005;
+
+    public static double cP = 0.03;
+    public static double cI = 0;
+    public static double cD = 0;
 
     private enum AutoMode{
         UNKNOWN,
@@ -143,21 +150,25 @@ public class Drive extends Subsystem{
 
         pidController = new PIDController(P, I, D);
         turnPidController = new PIDController(tP, tI, tD);
+        strafePidController = new PIDController(sP, sI, sD);
+        correctionPidController = new PIDController(cP, cI, cD);
 
         for (int i=0; i<4;i++){
             motors[i] = robot.getMotor("m" + i);
         }
 
+        omniTracker = robot.getMotor("m0");
+
 
 
         if(!inTeleOp){
-            //omniTracker = robot.getMotor("intakeMotor");
-           // omniTracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+           omniTracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             motors[0].setDirection(DcMotorEx.Direction.REVERSE);
             motors[1].setDirection(DcMotorEx.Direction.REVERSE);
             motors[2].setDirection(DcMotorEx.Direction.FORWARD);
             motors[3].setDirection(DcMotorEx.Direction.FORWARD);
+
 
             for (int i = 0; i < 4; i++){
                 motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -189,13 +200,21 @@ public class Drive extends Subsystem{
 
     @Override
     public void update(Canvas overlay){
-        telemetryData.addData("currentPos0", motors[0].getCurrentPosition());
+        //telemetryData.addData("currentPos0", motors[0].getCurrentPosition());
         telemetryData.addData("currentPos1", motors[1].getCurrentPosition());
         telemetryData.addData("currentPos2", -motors[2].getCurrentPosition());
         telemetryData.addData("currentPos3", -motors[3].getCurrentPosition());
+        telemetryData.addData("X Position", -omniTracker.getCurrentPosition());
 
         telemetryData.addData("target", target);
+
         telemetryData.addData("m0 power ", motors[0].getPower());
+        telemetryData.addData("m1 power ", motors[1].getPower());
+        telemetryData.addData("m2 power ", motors[2].getPower());
+        telemetryData.addData("m3 power ", motors[3].getPower());
+
+        telemetryData.addData("corr 0", correction0);
+        telemetryData.addData("corr 1", correction1);
 
         telemetryData.addData("heading (degrees)", getAngle());
         telemetryData.addData("inTeleOp ", inTeleOp);
@@ -205,9 +224,10 @@ public class Drive extends Subsystem{
         if (!inTeleOp){
 
             // adjust error for a motor power
-            //error = error /  12; // might move this statement to a method
             pidController.setOutputBounds(-1, 1);
             turnPidController.setOutputBounds(-1, 1);
+            strafePidController.setOutputBounds(-1, 1);
+            correctionPidController.setOutputBounds(-0.4, 0.4);
 
 
             switch (autoMode){
@@ -240,25 +260,16 @@ public class Drive extends Subsystem{
 
                 case STRAFE:
 
-                    // TODO add strafe alignment correction
-                    // TODO add functionality with omni wheel
-                    // the target and error are based on motors 0 and 2 but the values and the same
-                    // for motors 1 and 3 but opposite sign
+                    error0 = target - -omniTracker.getCurrentPosition();
+                    error1 = getAngle(); // used to correct heading
 
-                    error0 = target - motors[0].getCurrentPosition();  // strafeCurrentPosition()
-                    error1 = -target - motors[1].getCurrentPosition();
-                    error2 = target - -motors[2].getCurrentPosition();
-                    error3 = -target - -motors[3].getCurrentPosition();
-
-                    correction0 = pidController.update(error0);
-                    correction1 = pidController.update(error1);
-                    correction2 = pidController.update(error2);
-                    correction3 = pidController.update(error3);
+                    correction0 = strafePidController.update(error0);
+                    correction1 = correctionPidController.update(error1); // used to correct heading
 
                     motors[0].setPower(correction0);
-                    motors[1].setPower(correction1);
-                    motors[2].setPower(correction2);
-                    motors[3].setPower(correction3);
+                    motors[1].setPower(-correction0 - -correction1);
+                    motors[2].setPower(correction0 - correction1);
+                    motors[3].setPower(-correction0);
 
                     break;
 
@@ -345,7 +356,9 @@ public class Drive extends Subsystem{
     }
 
     public void strafeRight(double inches){
-        Xtarget = motorEncodersInchesToTicks(inches); // strafeCurrentPosition() // omni encoder ticks to inches
+        //Xtarget = motorEncodersInchesToTicks(inches); // omni encoder ticks to inches
+
+        Xtarget = omniEncodersInchesToTicks(inches);
 
         prepareMotors();
 
@@ -356,7 +369,9 @@ public class Drive extends Subsystem{
     }
 
     public void strafeLeft(double inches){
-        Xtarget = motorEncodersInchesToTicks(-inches); // strafeCurrentPosition() // omni encoder ticks to inches
+        //Xtarget = motorEncodersInchesToTicks(-inches); // omni encoder ticks to inches
+
+        Xtarget = omniEncodersInchesToTicks(-inches);
 
         prepareMotors();
 
@@ -388,8 +403,8 @@ public class Drive extends Subsystem{
         }
     }
 
-    public double strafeCurrentPosition(){
-        return omniTicksPerInch(omniTracker.getCurrentPosition());
+    public double strafeCurrentPositionInches(){
+        return omniTicksPerInch(-omniTracker.getCurrentPosition());
     }
 
 
@@ -464,7 +479,7 @@ public class Drive extends Subsystem{
     }
 
 
-    private int omniEncodersInchesToTicks(int inches) {
+    private int omniEncodersInchesToTicks(double inches) {
         double circumference = 2 * Math.PI * TRACKER_RADIUS;
         return (int) Math.round(inches * (500 * 4) / circumference);
     }
@@ -472,62 +487,6 @@ public class Drive extends Subsystem{
     private int motorEncodersInchesToTicks(double inches) {
         double circumference = 2 * Math.PI * WHEEL_RADIUS;
         return (int) Math.floor(inches * ticksPerRev / circumference);
-    }
-
-
-    ///////////////////////////////////////Angle Corrector//////////////////////////////////////////
-
-    public void setZero(){
-        resetAngle();
-    }
-
-
-    private void setError(){
-        error0 = getAngle();
-    }
-
-
-    private double Pcontroller(){
-        double output = Pcoefficient * error0;
-        return output;
-    }
-
-
-    private double PcontrollerTurn(){
-        return PcoefficientTurn * error0;
-    }
-
-
-    public void correctingPower(double defaultPower, int motorNum, String direction){
-        setError();
-
-        double correctionPower = Pcontroller();
-        double turnCorrectionPower = PcontrollerTurn();
-
-        double changeSign = Math.copySign(1, defaultPower); // 1 or -1
-
-        if (defaultPower != 0) {
-
-            if (direction.equals("right")) {
-                newPower = defaultPower - (correctionPower * changeSign);
-            }
-
-            else if (direction.equals("left")) {
-                newPower = defaultPower + (correctionPower * changeSign); // added instead of subtracted bc opposite adjustment to error is needed from right strafe
-            }
-        }
-
-        else {
-            if (motorNum == 0 || motorNum == 1) {
-                newPower = defaultPower - turnCorrectionPower;
-            }
-
-            else { // motors 2 and 3
-                newPower = defaultPower + turnCorrectionPower;
-            }
-        }
-
-        motors[motorNum].setPower(newPower);
     }
 
 

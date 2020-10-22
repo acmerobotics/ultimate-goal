@@ -70,14 +70,8 @@ public class TestAuto extends Auto{
     public void runBlueB(){
         ACMERobot robot = new ACMERobot(this);
 
-        robot.drive.moveForward(12);
-        robot.runUntil(robot.drive::atYPosition);
-
         robot.drive.strafeRight(12);
         robot.runUntil(robot.drive::atStrafePosition);
-
-        robot.drive.moveForward(12);
-        robot.runUntil(robot.drive::atYPosition);
 
         robot.drive.stopMotors();
 
