@@ -1,6 +1,8 @@
 package com.acmerobotics.opmodes.auto;
 
+import com.acmerobotics.robomatic.config.ConfigurationLoader;
 import com.acmerobotics.robot.ACMERobot;
+import com.acmerobotics.util.Configuration;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous
@@ -70,18 +72,38 @@ public class TestAuto extends Auto{
     public void runBlueB(){
         ACMERobot robot = new ACMERobot(this);
 
-        robot.drive.moveForward(12);
+        robot.drive.moveForward(50);
         robot.runUntil(robot.drive::atYPosition);
 
-        robot.drive.strafeRight(12);
-        robot.runUntil(robot.drive::atStrafePosition);
+        if (config.color == blue){
+            if (config.startLocation == A){
+                robot.drive.moveForward(24);
+                robot.runUntil(robot.drive::atYPosition);
+            }
 
-        robot.drive.moveForward(12);
-        robot.runUntil(robot.drive::atYPosition);
+            else{
+
+                robot.drive.moveForward(-24);
+                robot.runUntil(robot.drive::atYPosition);
+            }
+        }
+
+        else{
+            if (config.startLocation == A){
+                robot.drive.moveForward(24);
+                robot.runUntil(robot.drive::atYPosition);
+            }
+
+            else{
+                robot.drive.moveForward(-24);
+                robot.runUntil(robot.drive::atYPosition);
+            }
+        }
 
         robot.drive.stopMotors();
+        robot.update();
 
-        robot.runUntilStop();
+        // shoot rings
     }
 
     @Override

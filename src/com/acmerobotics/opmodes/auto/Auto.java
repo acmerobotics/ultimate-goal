@@ -7,10 +7,17 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public abstract class Auto extends LinearOpMode {
 
+    public Configuration.AllianceColor blue = Configuration.AllianceColor.BLUE;
+    public Configuration.AllianceColor red = Configuration.AllianceColor.RED;
+    public Configuration.StartLocation A = Configuration.StartLocation.A;
+    public Configuration.StartLocation B = Configuration.StartLocation.B;
+
+    public Configuration config;
+
     @Override
     public void runOpMode(){
 
-        Configuration config = (Configuration) new ConfigurationLoader(hardwareMap.appContext).getConfig();
+        config = (Configuration) new ConfigurationLoader(hardwareMap.appContext).getConfig();
 
         waitForStart();
 
