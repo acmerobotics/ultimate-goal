@@ -27,8 +27,8 @@ public class TestTele extends LinearOpMode {
         intake3 intake3 = new intake3(hardwareMap);
         TestRobot testRobot = new TestRobot(gamepad1, gamepad2);
 
-        testRobot.teleOpActions.add(intake2);
-        testRobot.teleOpActions.add(intake3);
+        testRobot.teleOpActions.add(intake2); // this code would be placed in the class extending Robot, similar to register subsystem
+        testRobot.teleOpActions.add(intake3); // this code would be placed in the class extending Robot, similar to register subsystem
 
         waitForStart();
 

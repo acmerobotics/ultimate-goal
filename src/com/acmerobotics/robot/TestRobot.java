@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestRobot{
+public class TestRobot{ // this code would go in the Robot class
 
     public Gamepad gamepad1;
     public Gamepad gamepad2;

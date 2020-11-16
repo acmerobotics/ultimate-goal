@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
-public class intake2 implements TeleOpActionImpl {
+public class intake2 implements TeleOpActionImpl { // a subsystm or anything else taking a part in teleOp will look similar to this
     public DcMotorEx motor1;
 
     public intake2(HardwareMap hardwareMap) {
