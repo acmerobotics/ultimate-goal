@@ -2,9 +2,7 @@ package com.acmerobotics.opmodes.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.robomatic.util.StickyGamepad;
-import com.acmerobotics.robot.TestRobot;
-import com.acmerobotics.robot.intake2;
-import com.acmerobotics.robot.intake3;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
