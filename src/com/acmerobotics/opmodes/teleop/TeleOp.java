@@ -14,9 +14,7 @@ public class TeleOp extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        StickyGamepad stickyGamepad = new StickyGamepad(gamepad1);
-
-        ACMERobot robot = new ACMERobot(this);
+        ACMERobot robot = new ACMERobot(this, true);
 
         waitForStart();
 
@@ -25,14 +23,6 @@ public class TeleOp extends LinearOpMode {
             Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
             robot.drive.setPower(v);
 
-            // press once to bring intake down and run wheels
-            // press again to stop wheels and bring intake up
-            if (stickyGamepad.a) {
-                robot.intake.intakeRings();
-            }
-
-
-            stickyGamepad.update();
             robot.update();
 
             telemetry.update();

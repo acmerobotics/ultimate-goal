@@ -17,32 +17,20 @@ public class TestTele extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        //DcMotorEx motor1 = hardwareMap.get(DcMotorEx.class,  "motor1");
-        StickyGamepad stickyGamepad = new StickyGamepad(gamepad1);
+        DcMotorEx motor1 = hardwareMap.get(DcMotorEx.class,  "motor1");
+        StickyGamepad stickyGamepad1 = new StickyGamepad(gamepad1);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();
         Telemetry dashboardTelemetry = dashboard.getTelemetry();
-
-        intake2 intake2 = new intake2(hardwareMap);
-        intake3 intake3 = new intake3(hardwareMap);
-        TestRobot testRobot = new TestRobot(gamepad1, gamepad2);
-
-        testRobot.teleOpActions.add(intake2); // this code would be placed in the class extending Robot, similar to register subsystem
-        testRobot.teleOpActions.add(intake3); // this code would be placed in the class extending Robot, similar to register subsystem
 
         waitForStart();
 
         while (!isStopRequested()) {
 
-            testRobot.updateTeleOpAction();
-
-            dashboardTelemetry.addData("power", intake2.motor1.getPower());
-            dashboardTelemetry.addData("a", gamepad1.a);
-            dashboardTelemetry.addData("b", gamepad1.b);
 
             telemetry.update();
             dashboardTelemetry.update();
-            stickyGamepad.update();
+            stickyGamepad1.update();
         }
 
     }

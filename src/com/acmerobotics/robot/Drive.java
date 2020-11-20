@@ -91,8 +91,6 @@ public class Drive extends Subsystem{
 
     public double newPower;
 
-    private boolean inTeleOp = false;
-
     private PIDController pidController;
 
     public static double P = 0.005;
@@ -128,19 +126,15 @@ public class Drive extends Subsystem{
     public static double XErrorTolerance = 5;
     public static double headingErrorTolerance = 5;
 
-
-
     private AutoMode autoMode = AutoMode.UNKNOWN;
 
-    private LinearOpMode opMode;
+    private boolean inTeleOp;
 
 
-    public Drive(Robot robot, LinearOpMode opMode){
+    public Drive(Robot robot, boolean inTeleOp){
         super("Drive");
 
-        this.opMode = opMode;
-
-        inTeleOp = isInTeleOp(); // anything in telOp folder will be considered a teleOp opMOde
+        this.inTeleOp = inTeleOp;
 
         BNO055IMUImpl imu = robot.getRevHubImu(0, new Robot.Orientation(Robot.Axis.POSITIVE_X, Robot.Axis.POSITIVE_Y, Robot.Axis.POSITIVE_Z)); // creates BN0055-IMU-Impl, imu orientation is remapped
         imuSensor = new CachingSensor<>(() -> imu.getAngularOrientation().firstAngle); // gets heading
@@ -571,15 +565,6 @@ public class Drive extends Subsystem{
         stopMotors();
         resetEncoders();
         resetEncoderOmni();
-    }
-
-
-    private boolean isInTeleOp (){
-        String opMode = String.valueOf(this.opMode);
-
-        int hasTeleOp = opMode.indexOf("teleop");
-
-        return hasTeleOp != -1;
     }
 
 }
