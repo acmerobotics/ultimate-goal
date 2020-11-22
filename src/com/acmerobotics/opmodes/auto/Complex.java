@@ -20,13 +20,6 @@ public class Complex extends Auto{
 //    SHOOT_RINGS,
 //    PARK
 
-    enum TargetZone {
-        A,
-        B,
-        C
-    }
-    Wobble.TargetZone targetZone;
-
     @Override
     public void runBlueA(){
         ACMERobot robot = new ACMERobot(this);
@@ -55,11 +48,11 @@ public class Complex extends Auto{
         robot.runUntil(robot.drive::atYPosition);
 
         // MOVE_TO_SQUARE
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveForward(24);
             robot.runUntil(robot.drive::atYPosition);
 
@@ -69,7 +62,7 @@ public class Complex extends Auto{
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveForward(48);
             robot.runUntil(robot.drive::atYPosition);
 
@@ -78,33 +71,33 @@ public class Complex extends Auto{
 
 
         // MOVE_BEHIND_LINE (will probably need to add more to the move back amount to ensure the robot is behind line)
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.moveBack(0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveBack(24 + 0); // Rw
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveBack(48 + 0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
 
         // STRAFE_TO_TOWER
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.strafeLeft(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
@@ -149,21 +142,21 @@ public class Complex extends Auto{
         robot.runUntil(robot.drive::atYPosition);
 
         // MOVE_TO_SQUARE
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.strafeRight(24); // check if it is more efficient to do a 180 turn + 180 turn or strafe 24 in
             robot.runUntil(robot.drive::atStrafePosition);
 
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveForward(24);
             robot.runUntil(robot.drive::atYPosition);
 
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveForward(48);
             robot.runUntil(robot.drive::atYPosition);
 
@@ -175,33 +168,33 @@ public class Complex extends Auto{
 
 
         // MOVE_BEHIND_LINE (will probably need to add more to the move back amount to ensure the robot is behind line)
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.moveBack(0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveBack(24 + 0); // Rw
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveBack(48 + 0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
 
         // STRAFE_TO_TOWER
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.strafeLeft(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.strafeLeft(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
@@ -249,21 +242,21 @@ public class Complex extends Auto{
         robot.runUntil(robot.drive::atTurningPosition);
 
         // MOVE_TO_SQUARE
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.strafeLeft(24); // check if it is more efficient to do a 180 turn + 180 turn or strafe 24 in
             robot.runUntil(robot.drive::atStrafePosition);
 
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveBack(24);
             robot.runUntil(robot.drive::atYPosition);
 
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveBack(48);
             robot.runUntil(robot.drive::atYPosition);
 
@@ -275,33 +268,33 @@ public class Complex extends Auto{
 
 
         // MOVE_BEHIND_LINE (will probably need to add more to the move back amount to ensure the robot is behind line)
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.moveForward(0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveForward(24 + 0); // Rw
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveForward(48 + 0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
 
         // STRAFE_TO_TOWER
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.strafeLeft(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
@@ -356,11 +349,11 @@ public class Complex extends Auto{
         robot.runUntil(robot.drive::atTurningPosition);
 
         // MOVE_TO_SQUARE
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveBack(24);
             robot.runUntil(robot.drive::atYPosition);
 
@@ -370,7 +363,7 @@ public class Complex extends Auto{
             // drop wobble
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveBack(48);
             robot.runUntil(robot.drive::atYPosition);
 
@@ -379,33 +372,33 @@ public class Complex extends Auto{
 
 
         // MOVE_BEHIND_LINE (will probably need to add more to the move back amount to ensure the robot is behind line)
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.moveForward(0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.moveForward(24 + 0); // Rw
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.moveForward(48 + 0); // Rw
             robot.runUntil(robot.drive::atYPosition);
         }
 
 
         // STRAFE_TO_TOWER
-        if (targetZone == Wobble.TargetZone.A){
+        if (targetZone == TargetZone.A){
             robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.B){
+        if (targetZone == TargetZone.B){
             robot.drive.strafeLeft(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
-        if (targetZone == Wobble.TargetZone.C){
+        if (targetZone == TargetZone.C){
             robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }

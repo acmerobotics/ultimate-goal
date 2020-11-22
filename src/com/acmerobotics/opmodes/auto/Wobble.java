@@ -17,13 +17,6 @@ public class Wobble extends Auto{
 //    PARK
 //    STRAFE_TO_TOWER,
 
-    enum TargetZone {
-        A,
-        B,
-        C
-    }
-    TargetZone targetZone;
-
     @Override
     public void runBlueA(){
         ACMERobot robot = new ACMERobot(this);

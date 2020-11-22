@@ -14,6 +14,13 @@ public abstract class Auto extends LinearOpMode {
 
     public Configuration config;
 
+    public enum TargetZone {
+        A,
+        B,
+        C
+    }
+    public TargetZone targetZone; // make sure vision sets targetZone
+
     @Override
     public void runOpMode(){
 
