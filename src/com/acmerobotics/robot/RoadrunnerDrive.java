@@ -3,27 +3,22 @@ package com.acmerobotics.robot;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
 import com.acmerobotics.roadrunner.control.PIDFController;
-import com.acmerobotics.roadrunner.drive.Drive;
 import com.acmerobotics.roadrunner.drive.DriveSignal;
 import com.acmerobotics.roadrunner.drive.MecanumDrive;
 import com.acmerobotics.roadrunner.followers.HolonomicPIDVAFollower;
-import com.acmerobotics.roadrunner.followers.TrajectoryFollower;
 import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.roadrunner.geometry.Vector2d;
-import com.acmerobotics.roadrunner.kinematics.Kinematics;
 import com.acmerobotics.roadrunner.profile.MotionProfile;
 import com.acmerobotics.roadrunner.trajectory.Trajectory;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
-import com.acmerobotics.roadrunner.trajectory.TrajectoryGenerator;
 import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.acmerobotics.robomatic.hardware.CachingSensor;
 import com.acmerobotics.robomatic.robot.Robot;
 import com.acmerobotics.robomatic.robot.Subsystem;
-import com.acmerobotics.robomatic.util.PIDController;
-import com.qualcomm.hardware.bosch.BNO055IMUImpl;
+import com.acmerobotics.util.DriveContants;
+import com.acmerobotics.util.TwoWheelTrackingLocalizer;
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -31,13 +26,10 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-//PS: rn i'm writing this with the motor encoders. Later, i'll add in the omni trackers.
 @Config
 public class RoadrunnerDrive extends Subsystem {
 
     //constants
-    private static final double WHEEL_RADIUS = 2;
-
     private static final double TRACKER_RADIUS = DistanceUnit.INCH.fromMm(35.0 / 2.0);
     private static final double TRACKER_TICKS_PER_INCH = (500 * 4) / (2 * TRACKER_RADIUS * Math.PI);
 
@@ -47,8 +39,8 @@ public class RoadrunnerDrive extends Subsystem {
     public static double HEADING_P = 0;
     public static double HEADING_I = 0;
     public static double HEADING_D = 0;
-    public static PIDCoefficients COEFFICIENTS = new PIDCoefficients(P, I, D);
-    public static PIDCoefficients HEADINGPID = new PIDCoefficients(HEADING_P, HEADING_I, HEADING_D);
+    public static PIDCoefficients TRANSLATIONAL_PID = new PIDCoefficients(P, I, D);
+    public static PIDCoefficients HEADING_PID = new PIDCoefficients(HEADING_P, HEADING_I, HEADING_D);
 
     public static double K_V = 0;
     public static double K_A = 0;
@@ -68,9 +60,14 @@ public class RoadrunnerDrive extends Subsystem {
     private DriveConstraints driveConstraints = new DriveConstraints(MAX_V, MAX_A, MAX_J, MAX_ANGLE_V, MAX_ANGLE_A, MAX_ANGLE_J);
     private Trajectory trajectory;
 
-    private HolonomicPIDVAFollower follower = new HolonomicPIDVAFollower(COEFFICIENTS, COEFFICIENTS, HEADINGPID);
+    private PIDFController turnController;
+    private MotionProfile turnProfile;
+
+    private HolonomicPIDVAFollower follower = new HolonomicPIDVAFollower(TRANSLATIONAL_PID, TRANSLATIONAL_PID, HEADING_PID);
 
     private long startTime;
+
+    private MecanumDrive mecanumDrive;
 
     private Pose2d targetVelocity = new Pose2d(0, 0, 0);
     private Pose2d currentEstPose = new Pose2d(0, 0, 0);
@@ -92,6 +89,7 @@ public class RoadrunnerDrive extends Subsystem {
 
     // imu variables
     //Orientation lastAngle = new Orientation();
+    private BNO055IMU imu;
     public CachingSensor imuSensor;
     private double lastAngle = 0;
     private double globalAngle;
@@ -120,15 +118,12 @@ public class RoadrunnerDrive extends Subsystem {
     private boolean inTeleOp = false;
 
     // event triggers
-
     private enum AutoMode{
         IDLE,
-        FOLLOWING_PATH,
-        OPEN_LOOP,
-        HOLD_POSITION
+        TURN,
+        FOLLLOW_TRAJECTORY,
+        OPEN_LOOP
     }
-
-    public double target = 0;
 
     private AutoMode autoMode = AutoMode.IDLE;
 
@@ -136,19 +131,23 @@ public class RoadrunnerDrive extends Subsystem {
 
 
     public RoadrunnerDrive(Robot robot, LinearOpMode opMode){
-        super("Drive");
+        super("Roadrunnner_Drive");
 
         this.opMode = opMode;
+
+        dashboard = FtcDashboard.getInstance();
+
+        turnController = new PIDFController(HEADING_PID);
+        turnController.setInputBounds(0, 2 * Math.PI);
 
         for (int i=0; i<4;i++){
             motors[i] = robot.getMotor("m" + i);
         }
 
-        BNO055IMUImpl imu = robot.getRevHubImu(0, new Robot.Orientation(Robot.Axis.POSITIVE_X, Robot.Axis.POSITIVE_Y, Robot.Axis.POSITIVE_Z)); // creates BN0055-IMU-Impl, imu orientation is remapped
+        imu = robot.getRevHubImu(0, new Robot.Orientation(Robot.Axis.POSITIVE_X, Robot.Axis.POSITIVE_Y, Robot.Axis.POSITIVE_Z)); // creates BN0055-IMU-Impl, imu orientation is remapped
         imuSensor = new CachingSensor<>(() -> imu.getAngularOrientation().firstAngle); // gets heading
         robot.registerCachingSensor(imuSensor); // adds imu to caching sensors, will then update the heading
 
-        dashboard = FtcDashboard.getInstance();
 
 
         if(!inTeleOp){
@@ -185,6 +184,7 @@ public class RoadrunnerDrive extends Subsystem {
 
         }
 
+        mecanumDrive.setLocalizer(new TwoWheelTrackingLocalizer(robot));
     }
 
     public void setPower(Pose2d target) { //set velocity (for joystick transform and such)
@@ -214,7 +214,7 @@ public class RoadrunnerDrive extends Subsystem {
         for (int i = 0; i < 4; i++) {
             Vector2d wheelVelocity = new Vector2d(v.getX() - v.getHeading() * WHEEL_POSITIONS[i].getY(),
                     v.getY() + v.getHeading() * WHEEL_POSITIONS[i].getX());
-            wheelOmega = (wheelVelocity.dot(ROTOR_DIRECTIONS[i]) * Math.sqrt(2)) / WHEEL_RADIUS;
+            wheelOmega = (wheelVelocity.dot(ROTOR_DIRECTIONS[i]) * Math.sqrt(2)) / DriveContants.WHEEL_RADIUS;
             motors[i].setVelocity(wheelOmega, AngleUnit.RADIANS);
 
 
@@ -224,12 +224,12 @@ public class RoadrunnerDrive extends Subsystem {
 
     public void followTrajectory(Trajectory trajectory){
         this.trajectory = trajectory;
-        autoMode = AutoMode.FOLLOWING_PATH;
+        autoMode = AutoMode.FOLLLOW_TRAJECTORY;
         startTime = System.currentTimeMillis();
     }
 
     public boolean isFollowingPath(){
-        return autoMode == AutoMode.FOLLOWING_PATH; //add trajectory is complete too
+        return autoMode == AutoMode.FOLLLOW_TRAJECTORY; //add trajectory is complete too
     }
 
     public void stop(){
@@ -247,19 +247,19 @@ public class RoadrunnerDrive extends Subsystem {
                     // do absolutely nothing. just sit here and be a placeholder.
                     break;
 
-                case FOLLOWING_PATH:
+                case TURN:
                     follower.followTrajectory(trajectory);
                     DriveSignal signal = follower.update(currentEstPose);
 
                     break;
 
 
-                case OPEN_LOOP:
+                case FOLLLOW_TRAJECTORY:
                     setVelocity(targetVelocity);
 
                     break;
 
-                case HOLD_POSITION:
+                case OPEN_LOOP:
                     //stuff for holding the position, I just don't want to write it rn
 
                     break;
@@ -271,7 +271,8 @@ public class RoadrunnerDrive extends Subsystem {
     }
 
 
-
-
+    public double getRawExternalHeading() {
+        return imu.getAngularOrientation().firstAngle;
+    }
 
 }
