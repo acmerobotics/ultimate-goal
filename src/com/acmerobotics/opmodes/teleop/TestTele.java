@@ -14,7 +14,7 @@ public class TestTele extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        DcMotorEx motor1 = hardwareMap.get(DcMotorEx.class,  "motor1");
+//        DcMotorEx motor1 = hardwareMap.get(DcMotorEx.class,  "motor1");
         StickyGamepad stickyGamepad = new StickyGamepad(gamepad1);
 
         FtcDashboard dashboard = FtcDashboard.getInstance();

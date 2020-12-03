@@ -20,8 +20,7 @@ public class Intake extends Subsystem {
     public static double upPosition = 0;
     public static double downPosition = 0;
 
-
-    private int num = 0;
+    private boolean runIntake = false;
 
     public Intake(Robot robot){
         super("Intake");
@@ -34,14 +33,13 @@ public class Intake extends Subsystem {
     public void update(Canvas overlay){
         telemetryData.addData("upPosition", upPosition);
         telemetryData.addData("downPosition", downPosition);
-        telemetryData.addData("num", num);
 
     }
 
 
     public void intakeRings(){
 
-        boolean runIntake = isOdd();
+        runIntake = !runIntake;
 
         if (runIntake){
 
@@ -66,10 +64,4 @@ public class Intake extends Subsystem {
         }
     }
 
-
-    private boolean isOdd(){
-        num++;
-
-        return  !(num % 2 == 0);
-    }
 }
