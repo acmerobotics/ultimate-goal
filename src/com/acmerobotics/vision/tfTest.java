@@ -13,9 +13,7 @@ public class tfTest extends LinearOpMode {
     @Override
     public void runOpMode(){
 
-        RingDetector ringDetector = new RingDetector();
-
-        ringDetector.init(hardwareMap);
+        RingDetector ringDetector = new RingDetector(hardwareMap);
 
         waitForStart();
 

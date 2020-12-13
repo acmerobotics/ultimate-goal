@@ -21,7 +21,7 @@ public class RingDetector {
 
 
 
-    public void init (HardwareMap hardwareMap){
+    public RingDetector (HardwareMap hardwareMap){
         initVuforia();
         initTf(hardwareMap);
     }
