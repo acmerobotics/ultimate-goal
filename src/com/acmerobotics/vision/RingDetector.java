@@ -20,7 +20,6 @@ public class RingDetector {
     private String ringsVisible;
 
 
-
     public RingDetector (HardwareMap hardwareMap){
         initVuforia();
         initTf(hardwareMap);
@@ -77,7 +76,7 @@ public class RingDetector {
         return ringCount();
     }
 
-    public int ringCount(){
+    private int ringCount(){
         if (ringsVisible != null) {
             if (ringsVisible.equals(QUAD)){
                     return 4;
