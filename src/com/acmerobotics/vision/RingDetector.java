@@ -46,12 +46,12 @@ public class RingDetector {
         TFObjectDetector.Parameters parameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
 
         // set up parameters, how confident before declaring obj in view as the target
-        parameters.minResultConfidence = 0.5f;
+        parameters.minResultConfidence = 0.6f;
 
         // create tfDetector instance
         tfDetector = ClassFactory.getInstance().createTFObjectDetector(parameters, vuforia);
 
-        // load tf models
+        // load tf models and label them
         tfDetector.loadModelFromAsset("UltimateGoal.tflite", QUAD, SINGLE);
     }
 
