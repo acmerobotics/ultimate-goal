@@ -69,28 +69,28 @@ public class DriveAutoTest extends LinearOpMode {
             //Telemetry.addData("inTeleOP", robot.drive.inTeleOp);
 
             //Telemetry.update();
+////
+//            if (gamepad1.y) {
+//                robot.drive.moveForward(distance);
+//            }
+////
+//            if (gamepad1.x){
+//                robot.drive.turnRight(90);
+//            }
+////
+//            if (gamepad1.a) {
+//                robot.drive.motors[0].setPower(0.5);
+//                robot.drive.motors[1].setPower(0.5);
+//                robot.drive.motors[2].setPower(0.5);
+//                robot.drive.motors[3].setPower(0.5);
+//            }
 //
-            if (gamepad1.y) {
-                robot.drive.moveForward(distance);
-            }
-//
-            if (gamepad1.x){
-                robot.drive.turnRight(90);
-            }
-//
-            if (gamepad1.a) {
-                robot.drive.motors[0].setPower(0.5);
-                robot.drive.motors[1].setPower(0.5);
-                robot.drive.motors[2].setPower(0.5);
-                robot.drive.motors[3].setPower(0.5);
-            }
-
-            if (gamepad1.b) {
-                robot.drive.motors[0].setPower(0);
-                robot.drive.motors[1].setPower(0);
-                robot.drive.motors[2].setPower(0);
-                robot.drive.motors[3].setPower(0);
-            }
+//            if (gamepad1.b) {
+//                robot.drive.motors[0].setPower(0);
+//                robot.drive.motors[1].setPower(0);
+//                robot.drive.motors[2].setPower(0);
+//                robot.drive.motors[3].setPower(0);
+//            }
 
             robot.update();
 

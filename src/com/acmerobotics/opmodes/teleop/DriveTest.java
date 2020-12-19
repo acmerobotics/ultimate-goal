@@ -25,7 +25,8 @@ public class DriveTest extends LinearOpMode {
         while(!isStopRequested()){
 
             Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-            robot.drive.setPower(v);
+            //
+            // +robot.drive.setPower(v);
 
             robot.update();
 

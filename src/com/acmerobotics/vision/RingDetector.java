@@ -15,10 +15,9 @@ public class RingDetector {
     private static final String SINGLE = "Single";
 
     private VuforiaLocalizer vuforia;
-    private TFObjectDetector tfDetector; // private
+    private TFObjectDetector tfDetector;
 
     private String ringsVisible;
-
 
     public RingDetector (HardwareMap hardwareMap){
         initVuforia();
@@ -43,7 +42,8 @@ public class RingDetector {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
         // will display camera feed with tf filter on screen to show obj detection (shows view)
-        TFObjectDetector.Parameters parameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
+        //TFObjectDetector.Parameters parameters = new TFObjectDetector.Parameters(tfodMonitorViewId); // use for testing
+        TFObjectDetector.Parameters parameters = new TFObjectDetector.Parameters(); // use during competition
 
         // set up parameters, how confident before declaring obj in view as the target
         parameters.minResultConfidence = 0.6f;
@@ -82,13 +82,13 @@ public class RingDetector {
                     return 4;
                 }
 
-                if (ringsVisible.equals(SINGLE)){
-                    return 1;
-                }
+            if (ringsVisible.equals(SINGLE)){
+                return 1;
+            }
 
-                else {
-                    return 0;
-                }
+            else {
+                return 0;
+            }
         }
         else return 0;
     }
