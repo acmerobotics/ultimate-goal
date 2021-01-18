@@ -1,9 +1,12 @@
 package com.acmerobotics.opmodes.auto;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.robomatic.config.ConfigurationLoader;
 import com.acmerobotics.robot.ACMERobot;
 import com.acmerobotics.util.Configuration;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Autonomous
 public class TestAuto extends Auto{
@@ -30,38 +33,11 @@ public class TestAuto extends Auto{
     public void runBlueA() {
         ACMERobot robot = new ACMERobot(this);
 
+        robot.drive.strafeRight(12);
+        robot.runUntil(robot.drive::atStrafePosition);
+
         robot.drive.moveForward(12);
         robot.runUntil(robot.drive::atYPosition);
-
-
-        robot.drive.turnRight(90);
-        robot.runUntil(robot.drive::atTurningPosition);
-
-
-        robot.drive.turnLeft(90);
-        robot.runUntil(robot.drive::atTurningPosition);
-
-
-        if (targetZone == TargetZone.A){
-            // drop wobble
-        }
-
-        if (targetZone == TargetZone.B){
-            robot.drive.moveForward(12);
-            robot.runUntil(robot.drive::atYPosition);
-
-            robot.drive.strafeRight(12); // check if it is more efficient to do a 180 turn + 180 turn or strafe 24 in
-            robot.runUntil(robot.drive::atStrafePosition);
-
-            // drop wobble
-        }
-
-        if (targetZone == TargetZone.C){
-            robot.drive.moveForward(12);
-            robot.runUntil(robot.drive::atYPosition);
-
-            // drop wobble
-        }
 
         robot.drive.stopMotors();
 
@@ -72,38 +48,19 @@ public class TestAuto extends Auto{
     public void runBlueB(){
         ACMERobot robot = new ACMERobot(this);
 
-        robot.drive.moveForward(50);
+        robot.drive.moveForward(12);
         robot.runUntil(robot.drive::atYPosition);
 
-        if (config.color == blue){
-            if (config.startLocation == A){
-                robot.drive.moveForward(24);
-                robot.runUntil(robot.drive::atYPosition);
-            }
+        robot.drive.turnRight(90);
+        robot.runUntil(robot.drive::atTurningPosition);
 
-            else{
 
-                robot.drive.moveForward(-24);
-                robot.runUntil(robot.drive::atYPosition);
-            }
-        }
-
-        else{
-            if (config.startLocation == A){
-                robot.drive.moveForward(24);
-                robot.runUntil(robot.drive::atYPosition);
-            }
-
-            else{
-                robot.drive.moveForward(-24);
-                robot.runUntil(robot.drive::atYPosition);
-            }
-        }
+        robot.drive.turnLeft(90);
+        robot.runUntil(robot.drive::atTurningPosition);
 
         robot.drive.stopMotors();
-        robot.update();
 
-        // shoot rings
+        robot.runUntilStop();
     }
 
     @Override

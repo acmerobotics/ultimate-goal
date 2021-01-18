@@ -3,7 +3,7 @@ package com.acmerobotics.opmodes.auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous
+@Autonomous()
 public class Wobble extends Auto{
 
 //    TO_RINGS,

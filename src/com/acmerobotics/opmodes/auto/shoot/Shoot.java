@@ -1,9 +1,10 @@
-package com.acmerobotics.opmodes.auto;
+package com.acmerobotics.opmodes.auto.shoot;
 
+import com.acmerobotics.opmodes.auto.Auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-@Autonomous
+@Autonomous(group = "shoot autos", name = "shoot")
 public class Shoot extends Auto {
 
     @Override

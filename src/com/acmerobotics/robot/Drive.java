@@ -33,15 +33,19 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Config
 public class Drive extends Subsystem{
+
+    //TODO: fix drive coordinate plan. Should be positve x forward and positive y to the robots left. I have it using reg coordinate plane right now
+
     //constants
     private static final double WHEEL_RADIUS = 2;
 
     private static final double TRACKER_RADIUS = DistanceUnit.INCH.fromMm(35.0 / 2.0);
-    private static final double TRACKER_TICKS_PER_INCH = (500 * 4) / (2 * TRACKER_RADIUS * Math.PI);
+    private static final double TRACKER_TICKS_PER_REV = 8192;
 
     //hardware devices
     public DcMotorEx[] motors = new DcMotorEx[4];
-    public DcMotorEx omniTracker;
+    public DcMotorEx omniTrackerX;
+    public DcMotorEx omniTrackerY;
 
     // motors and motor encoder variables
     private static double MAX_V = 30;
@@ -127,7 +131,7 @@ public class Drive extends Subsystem{
 
     // should be changed if needed (in ticks)
     public static double YErrorTolerance = 5;
-    public static double XErrorTolerance = 5;
+    public static double XErrorTolerance = 1000;
     public static double headingErrorTolerance = 5;
 
 
@@ -157,10 +161,12 @@ public class Drive extends Subsystem{
             motors[i] = robot.getMotor("m" + i);
         }
 
-        omniTracker = robot.getMotor("m0");
+        omniTrackerX = robot.getMotor("omniX");
+        omniTrackerY = robot.getMotor("intakeMotor");
 
         if(!inTeleOp){
-           omniTracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+           omniTrackerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+           omniTrackerY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
             motors[0].setDirection(DcMotorEx.Direction.REVERSE);
             motors[1].setDirection(DcMotorEx.Direction.REVERSE);
@@ -201,7 +207,11 @@ public class Drive extends Subsystem{
         telemetryData.addData("currentPos1", motors[1].getCurrentPosition());
         telemetryData.addData("currentPos2", -motors[2].getCurrentPosition());
         telemetryData.addData("currentPos3", -motors[3].getCurrentPosition());
-        telemetryData.addData("X Position", -omniTracker.getCurrentPosition());
+        telemetryData.addData("X Position", omniTrackerX.getCurrentPosition());
+        telemetryData.addData("Y Position", omniTrackerY.getCurrentPosition());
+        telemetryData.addData("X position inches", strafeCurrentPositionInches());
+        telemetryData.addData("Y position inches", omniTicksPerInch(omniTrackerY.getCurrentPosition()));
+
 
         telemetryData.addData("target", target);
 
@@ -224,7 +234,7 @@ public class Drive extends Subsystem{
             pidController.setOutputBounds(-1, 1);
             turnPidController.setOutputBounds(-1, 1);
             strafePidController.setOutputBounds(-1, 1);
-            correctionPidController.setOutputBounds(-0.4, 0.4);
+            correctionPidController.setOutputBounds(-0.5, 0.5);
 
 
             switch (autoMode){
@@ -257,7 +267,7 @@ public class Drive extends Subsystem{
 
                 case STRAFE:
 
-                    error0 = target - -omniTracker.getCurrentPosition();
+                    error0 = target - omniTrackerX.getCurrentPosition();
                     error1 = getAngle(); // used to correct heading
 
                     correction0 = strafePidController.update(error0);
@@ -401,7 +411,7 @@ public class Drive extends Subsystem{
     }
 
     public double strafeCurrentPositionInches(){
-        return omniTicksPerInch(-omniTracker.getCurrentPosition());
+        return omniTicksPerInch(omniTrackerX.getCurrentPosition());
     }
 
 
@@ -478,7 +488,7 @@ public class Drive extends Subsystem{
 
     private int omniEncodersInchesToTicks(double inches) {
         double circumference = 2 * Math.PI * TRACKER_RADIUS;
-        return (int) Math.round(inches * (500 * 4) / circumference);
+        return (int) Math.round(inches * TRACKER_TICKS_PER_REV / circumference);
     }
 
     private int motorEncodersInchesToTicks(double inches) {
@@ -490,11 +500,9 @@ public class Drive extends Subsystem{
     // misc
 
     private double omniTicksPerInch(int ticks){
-        double D = 1.4;
-        int ticksPerRev = 2000;
-        double circumference = D * 3.14;
+        double circumference = 2 * Math.PI * TRACKER_RADIUS;
 
-        return (circumference *  ticks / ticksPerRev);
+        return (circumference *  ticks / TRACKER_TICKS_PER_REV);
     }
 
     public double ticksToInches(int ticks) {
@@ -517,7 +525,7 @@ public class Drive extends Subsystem{
     }
 
     public void resetEncoderOmni(){
-        omniTracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        omniTrackerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
     }
 
