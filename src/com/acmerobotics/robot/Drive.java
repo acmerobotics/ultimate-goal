@@ -95,19 +95,19 @@ public class Drive extends Subsystem{
     private PIDController strafePidController;
     private PIDController correctionPidController;
 
-    public static double P = 0.005;
+    public static double P = 0.0003;
     public static double I = 0;
-    public static double D = 0;
+    public static double D = 0.00007;
 
-    public static double tP = 0.01;
+    public static double tP = 0.035;
     public static double tI = 0;
-    public static double tD = 0;
+    public static double tD = 0.003;
 
     public static double sP = 0.00045;
     public static double sI = 0;
     public static double sD = 0.00005;
 
-    public static double cP = 0.03;
+    public static double cP = 0.05; // 0.3
     public static double cI = 0;
     public static double cD = 0;
 
@@ -130,7 +130,7 @@ public class Drive extends Subsystem{
     public double target = 0;
 
     // should be changed if needed (in ticks)
-    public static double YErrorTolerance = 5;
+    public static double YErrorTolerance = 1000;
     public static double XErrorTolerance = 1000;
     public static double headingErrorTolerance = 5;
 
@@ -231,9 +231,9 @@ public class Drive extends Subsystem{
         if (!inTeleOp){
 
             // adjust error for a motor power
-            pidController.setOutputBounds(-1, 1);
+            pidController.setOutputBounds(-0.9, 0.9);
             turnPidController.setOutputBounds(-1, 1);
-            strafePidController.setOutputBounds(-1, 1);
+            strafePidController.setOutputBounds(-0.8, 0.8);
             correctionPidController.setOutputBounds(-0.5, 0.5);
 
 
@@ -243,27 +243,23 @@ public class Drive extends Subsystem{
                     motors[1].setPower(0);
                     motors[2].setPower(0);
                     motors[3].setPower(0);
+
                     break;
 
                 case Y:
 
-                    error0 = target - motors[0].getCurrentPosition();
-                    error1 = target - motors[1].getCurrentPosition();
-                    error2 = target - -motors[2].getCurrentPosition();
-                    error3 = target - -motors[3].getCurrentPosition();
+                    error0 = target - omniTrackerY.getCurrentPosition();
+                    error1 = getAngle(); // used to correct heading
 
                     correction0 = pidController.update(error0);
-                    correction1 = pidController.update(error1);
-                    correction2 = pidController.update(error2);
-                    correction3 = pidController.update(error3);
+                    correction1 = correctionPidController.update(error1); // used to correct heading
 
-                    motors[0].setPower(correction0);
-                    motors[1].setPower(correction1);
-                    motors[2].setPower(correction2);
-                    motors[3].setPower(correction3);
+                    motors[0].setPower(correction0 + correction1);
+                    motors[1].setPower(correction0 + correction1);
+                    motors[2].setPower(correction0);
+                    motors[3].setPower(correction0);
 
                     break;
-
 
                 case STRAFE:
 
@@ -341,7 +337,7 @@ public class Drive extends Subsystem{
     // linear movements
 
     public void moveForward(double inches){
-        Ytarget = motorEncodersInchesToTicks(inches);
+        Ytarget = omniEncodersInchesToTicks(inches);
 
         prepareMotors();
 
@@ -352,7 +348,7 @@ public class Drive extends Subsystem{
     }
 
     public void moveBack(double inches){
-        Ytarget = motorEncodersInchesToTicks(-inches);
+        Ytarget = omniEncodersInchesToTicks(-inches);
 
         prepareMotors();
 
@@ -435,6 +431,14 @@ public class Drive extends Subsystem{
 
         target = getAngle() + turnTarget;
         error0 = headingErrorTolerance;
+
+        autoMode = AutoMode.TURN;
+    }
+
+    public void turnTo(double angle){
+        prepareMotors();
+
+        target = angle;
 
         autoMode = AutoMode.TURN;
     }
@@ -554,6 +558,8 @@ public class Drive extends Subsystem{
         for (int i = 0; i < 4; i++){
             motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+            omniTrackerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            omniTrackerY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
     }
 

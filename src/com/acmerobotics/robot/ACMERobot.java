@@ -7,8 +7,9 @@ public class ACMERobot extends Robot {
 
     public final Drive drive;
 
-    public double len = 0;
-    public double width = 0;
+    public double len = 17.4;
+    public double width = 18;
+    public double errorMargin = 4;
 
     public ACMERobot(LinearOpMode opMode){
         super(opMode);

@@ -22,44 +22,15 @@ public abstract class Auto extends LinearOpMode {
     public TargetZone targetZone; // make sure vision sets targetZone
 
     @Override
-    public void runOpMode(){
+    public void runOpMode() throws InterruptedException{
 
         config = (Configuration) new ConfigurationLoader(hardwareMap.appContext).getConfig();
 
         waitForStart();
 
-        if (config.color == Configuration.AllianceColor.BLUE){
-
-            if (config.startLocation == Configuration.StartLocation.A){
-                runBlueA();
-            }
-
-            else {
-                runBlueB();
-            }
-
-        }
-
-        else{
-
-            if (config.startLocation == Configuration.StartLocation.B){
-                runRedB();
-            }
-
-            else {
-                runRedA();
-            }
-
-        }
+        run();
     }
 
-
-    abstract void runBlueA();
-
-    abstract void runBlueB();
-
-    abstract void runRedB();
-
-    abstract void runRedA();
+    public abstract void run() throws InterruptedException;
 
 }
