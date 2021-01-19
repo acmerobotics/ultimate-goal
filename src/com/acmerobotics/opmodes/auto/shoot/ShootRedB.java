@@ -8,22 +8,29 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 public class ShootRedB extends Auto {
 
     @Override
-    public void run(){
+    public void run()throws InterruptedException{
         ACMERobot robot = new ACMERobot(this);
 
-//        robot.drive.moveForward(80 -robot.len);
-//        robot.runUntil(robot.drive::atYPosition);
-//
-//        robot.drive.strafeRight(12);
-//        robot.runUntil(robot.drive::atStrafePosition);
-//
-//        robot.drive.stopMotors();
-//        robot.update();
-//
-//        // shoot rings
-//
-//        robot.drive.moveForward(robot.len / 2);
-//        robot.runUntil(robot.drive::atYPosition);
+        robot.drive.moveForward(80 - (robot.len + robot.errorMargin));
+        robot.runUntil(robot.drive::atYPosition);
+
+        robot.drive.turnTo(0);
+        robot.runForTime(2000);
+
+        robot.drive.strafeRight(11);
+        robot.runUntil(robot.drive::atStrafePosition);
+
+        robot.drive.moveBack(5);
+        robot.runUntil(robot.drive::atYPosition);
+
+        robot.drive.stopMotors();
+        robot.update();
+
+        // shoot rings
+        Thread.sleep(3000);
+
+        robot.drive.moveForward((robot.len /2) + 2);
+        robot.runUntil(robot.drive::atYPosition);
 
 
         robot.drive.stopMotors();

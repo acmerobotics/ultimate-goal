@@ -18,7 +18,7 @@ public class ShootBlueA extends Auto {
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(12);
+        robot.drive.strafeRight(11);
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.moveBack(4);
