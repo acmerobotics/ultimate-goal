@@ -1,4 +1,4 @@
-package com.acmerobotics.opmodes.auto;
+package com.acmerobotics.opmodes.auto.park;
 
 import com.acmerobotics.robomatic.config.ConfigurationLoader;
 import com.acmerobotics.robot.ACMERobot;
@@ -6,7 +6,7 @@ import com.acmerobotics.util.Configuration;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-@Autonomous
+@Autonomous(group = "Park")
 public class Park extends LinearOpMode {
 
     @Override

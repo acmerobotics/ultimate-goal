@@ -530,6 +530,7 @@ public class Drive extends Subsystem{
 
     public void resetEncoderOmni(){
         omniTrackerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        omniTrackerY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
     }
 
