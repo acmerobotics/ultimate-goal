@@ -29,6 +29,8 @@ public class tfTest extends LinearOpMode {
 
             Telemetry.addData("rings", robot.ringDetector.detectedRings());
             Telemetry.update();
+
+            robot.update();
         }
         robot.ringDetector.stopDetecting();
     }

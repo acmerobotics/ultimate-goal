@@ -1,5 +1,7 @@
 package com.acmerobotics.vision;
 
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.robomatic.robot.Subsystem;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
@@ -9,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.List;
 
-public class RingDetector {
+public class RingDetector extends Subsystem {
     private static final String KEY = "AdzxQPD/////AAABmWQr+AytbUpprVx2VNTgNiJgawbK313otTyXa3Th2KAhi06wLMwml/nAjh58jdIbDitq5cji21735oTIvYjaoFNdeEZzhQW6aieofpzebPDxtAUTXKVDws1MCES3iCBk2z0z8YhwaRfREOj6VdiqY1zPyhc5vBrnc8ioV2B1Jyuz56SGeHq9tmQ5KiYwUPfGSKZ1+p3vWqymEmwOcN7Ym/oOf6ZVLJgrd+NEJM2TNg1xwepmiexQVVwiBWpUDx9/Q6DpQIPpapiyoCDzXZoOMBUxxqw3HhHI1ZWA//utIdWRElWbZ2+Y4umURnZg54HT4PVe6nMzR8t56YXZUB851ly0D6G3WQoySEOkVg46CrL7";
     private static final String QUAD = "Quad";
     private static final String SINGLE = "Single";
@@ -19,7 +21,10 @@ public class RingDetector {
 
     private String ringsVisible;
 
+    private boolean startDetecting = false;
+
     public RingDetector (HardwareMap hardwareMap){
+        super("RingDetector");
         initVuforia();
         initTf(hardwareMap);
     }
@@ -57,13 +62,15 @@ public class RingDetector {
 
     public void startDetecting(){
         tfDetector.activate();
+        startDetecting = true;
     }
 
     public void stopDetecting(){
         tfDetector.deactivate();
+        startDetecting = false;
     }
 
-    public int detectedRings(){
+    private void detectRings(){
         List<Recognition> recognitions = tfDetector.getUpdatedRecognitions();
 
         if (recognitions != null) {
@@ -73,10 +80,9 @@ public class RingDetector {
                 ringsVisible = recognition.getLabel();
             }
         }
-        return ringCount();
     }
 
-    private int ringCount(){
+    public int detectedRings(){
         if (ringsVisible != null) {
             if (ringsVisible.equals(QUAD)){
                     return 4;
@@ -92,4 +98,12 @@ public class RingDetector {
         }
         else return 0;
     }
+
+    @Override
+    public void update(Canvas Overlay){
+        if (startDetecting){
+            detectRings();
+        }
+    }
+
 }
