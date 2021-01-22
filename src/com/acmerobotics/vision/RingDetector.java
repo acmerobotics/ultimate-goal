@@ -1,10 +1,13 @@
 package com.acmerobotics.vision;
 
+import android.hardware.camera2.CameraManager;
+
 import com.acmerobotics.dashboard.canvas.Canvas;
 import com.acmerobotics.robomatic.robot.Subsystem;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
@@ -25,18 +28,19 @@ public class RingDetector extends Subsystem {
 
     public RingDetector (HardwareMap hardwareMap){
         super("RingDetector");
-        initVuforia();
+        initVuforia(hardwareMap);
         initTf(hardwareMap);
     }
 
-    private void initVuforia(){
+    private void initVuforia(HardwareMap hardwareMap){
 
         // create parameter instance, don't need cameraMonitorViewId (tf has their own)
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
 
         // set up parameters
         parameters.vuforiaLicenseKey = KEY;
-        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+//        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "webCam");
 
         // create vuforia instance
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
