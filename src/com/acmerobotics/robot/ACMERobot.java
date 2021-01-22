@@ -7,10 +7,15 @@ public class ACMERobot extends Robot {
 
     public final Drive drive;
 
+    public double len = 17.4;
+    public double width = 18;
+    public double errorMargin = 4;
+
     public ACMERobot(LinearOpMode opMode){
         super(opMode);
 
-        registerHub("Expansion Hub 2");
+        registerHub("Expansion Hub 1");
+        registerHub("Control Hub");
 
         drive = new Drive(this, opMode);
         registerSubsytem(drive);
