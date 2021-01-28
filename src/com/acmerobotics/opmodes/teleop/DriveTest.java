@@ -11,7 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 @Config
-@TeleOp(name="Drive Test")
+@TeleOp(name="DriveTest")
 public class DriveTest extends LinearOpMode {
 
     @Override

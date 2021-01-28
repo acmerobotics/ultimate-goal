@@ -10,7 +10,7 @@ public class ACMERobot extends Robot {
     public ACMERobot(LinearOpMode opMode){
         super(opMode);
 
-        registerHub("Expansion Hub 2");
+        registerHub("Expansion Hub 1");
 
         drive = new Drive(this, opMode);
         registerSubsytem(drive);
