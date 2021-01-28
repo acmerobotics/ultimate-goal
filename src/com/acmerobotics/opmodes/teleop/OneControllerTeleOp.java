@@ -14,7 +14,7 @@ public class OneControllerTeleOp extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
 
-        state = 0;
+        state = 1;
 
         StickyGamepad stickyGamepad1 = new StickyGamepad(gamepad1);
 
@@ -28,7 +28,7 @@ public class OneControllerTeleOp extends LinearOpMode {
 
             switch (state){
 
-                case 0:
+                case 1:
 
                     Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
                     robot.drive.setPower(v);
@@ -43,23 +43,25 @@ public class OneControllerTeleOp extends LinearOpMode {
 
                     if (stickyGamepad1.x){
 
-                        state = 1;
+                        state = 2;
                     }
 
                     break;
 
 
-                case 1:
+                case 2:
 
                     //controls for gamepad 2 (we don't have those yet)
 
                     if (stickyGamepad1.x){
-                        state = 0;
+                        state = 1;
                     }
 
 
 
             }
+
+            telemetry.addData("Gamepad State:", state);
 
 
             stickyGamepad1.update();
