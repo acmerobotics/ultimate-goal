@@ -1,12 +1,14 @@
 package com.acmerobotics.robot;
 
 import com.acmerobotics.robomatic.robot.Robot;
+import com.acmerobotics.vision.RingDetector;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 public class ACMERobot extends Robot {
 
     public final Drive drive;
     public final Intake intake;
+    public final RingDetector ringDetector;
 
     public double len = 17.4;
     public double width = 18;
@@ -20,8 +22,10 @@ public class ACMERobot extends Robot {
 
         drive = new Drive(this, opMode);
         intake = new Intake(this);
+        ringDetector = new RingDetector(opMode.hardwareMap);
 
         registerSubsytem(drive);
         registerSubsytem(intake);
+        registerSubsytem(ringDetector);
     }
 }
