@@ -26,7 +26,7 @@ public class TestV1 extends LinearOpMode {
         while (!isStopRequested()) {
 
             // press a to start launcher motor, press a again to stop
-            if (stickyGamepad.a){
+            if (stickyGamepad.x){
                 robot.launcher.shoot();
             }
 
