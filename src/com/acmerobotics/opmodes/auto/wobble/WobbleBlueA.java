@@ -10,8 +10,6 @@ public class WobbleBlueA extends Auto {
     @Override
     public void run() throws InterruptedException {
 
-        targetZone = TargetZone.C;
-
         ACMERobot robot = new ACMERobot(this);
 
         // TO_RINGS
@@ -26,7 +24,10 @@ public class WobbleBlueA extends Auto {
 
         // DETECT_RINGS
         robot.drive.stopMotors();
+        robot.ringDetector.startDetecting();
         robot.runForTime(3000);
+        robot.ringDetector.stopDetecting();
+        robot.runForTime(500);
 
         // TURN_BACK
         robot.drive.turnLeft(90);
@@ -36,6 +37,20 @@ public class WobbleBlueA extends Auto {
         // MOVE_TO_LINE
         robot.drive.moveForward(34);
         robot.runUntil(robot.drive::atYPosition);
+
+
+        // DETERMINE_TARGET_ZONE
+        if (robot.ringDetector.detectedRings() == 0){
+            targetZone = TargetZone.A;
+        }
+
+        else if (robot.ringDetector.detectedRings() == 1){
+            targetZone = TargetZone.B;
+        }
+
+        else{
+            targetZone = TargetZone.C;
+        }
 
 
         // MOVE_TO_SQUARE
