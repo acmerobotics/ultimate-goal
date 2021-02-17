@@ -1,7 +1,6 @@
 package com.acmerobotics.util;
 
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 
@@ -16,7 +15,7 @@ public class RPMTool {
 
     private ElapsedTime time;
 
-    private DcMotorEx motor;
+    private DcMotor motor;
 
     private double Time = 0.001; // set a non 0 value to prevent any initial div by 0
     private double ticks = 0;
@@ -28,7 +27,7 @@ public class RPMTool {
      * motor that you want to read the RPM of or write the RPM needs to be passed as the motor parameter.
      * The ticks per revolution also needs to be passed as a parameter (you'll find value on motor website).
      */
-    public RPMTool(DcMotorEx motor, double TICKS_PER_REVOLUTION){
+    public RPMTool(DcMotor motor, double TICKS_PER_REVOLUTION){
 
         this.TICKS_PER_REVOLUTION = TICKS_PER_REVOLUTION;
 
@@ -69,13 +68,13 @@ public class RPMTool {
 
     // convert RPM to ticks per sec then set as velocity
     public void setRPM(double targetRPM){
-        motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER); // I only have to set this once
+        //motor.setMode(DcMotorEx.RunMode.RUN_USING_ENCODER); // I only have to set this once
 
         // convert rpm to ticks per sec
         double ticksPerSec = targetRPM * TICKS_PER_REVOLUTION / 60;
 
         // set velocity
-        motor.setVelocity(ticksPerSec);
+        //motor.setVelocity(ticksPerSec);
     }
 
 }
