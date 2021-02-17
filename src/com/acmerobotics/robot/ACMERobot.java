@@ -7,6 +7,7 @@ public class ACMERobot extends Robot {
 
     public final Drive drive;
     public final Intake intake;
+    public Launcher launcher; // adjust Launcher Version HERE!
 
     public double len = 17.4;
     public double width = 18;
@@ -20,8 +21,10 @@ public class ACMERobot extends Robot {
 
         drive = new Drive(this, opMode);
         intake = new Intake(this);
+        launcher = new Launcher(this);
 
         registerSubsytem(drive);
         registerSubsytem(intake);
+        registerSubsytem(launcher);
     }
 }
