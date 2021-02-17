@@ -31,4 +31,11 @@ public class ACMERobot extends Robot {
         registerSubsytem(ringDetector);
         registerSubsytem(launcher);
     }
+
+    public void shootRingA(){
+        launcher.kickRing();
+        runForTime(1000);
+        launcher.resetKicker();
+        runForTime(1000);
+    }
 }

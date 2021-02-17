@@ -18,14 +18,18 @@ public class Launcher extends Subsystem {
     private boolean shooting = false;
 
     public DcMotor launcherShooterMotor;
+    public Servo aimServo;
     public Servo launcherServo;
 
     public double servoPosition = 0;
-    public static double servoIncrement = 0.1;
+    public static double servoIncrement = 0.05;
 
     public static double lowShot = 0;
     public static double midShot = 0;
     public static double highShot = 0;
+
+    public static double kickPosition = 0;
+    public static double resetPosition = 0;
 
 
     public Launcher(Robot robot) {
@@ -35,12 +39,14 @@ public class Launcher extends Subsystem {
         launcherShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         launcherShooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        aimServo = robot.getServo("aimServo");
         launcherServo = robot.getServo("shooterServo");
     }
 
     @Override
     public void update(Canvas Overlay){
-
+        telemetryData.addData("aimPosition", aimServo.getPosition());
+        telemetryData.addData("kickerPosition", launcherServo.getPosition());
     }
 
 
@@ -55,27 +61,52 @@ public class Launcher extends Subsystem {
         }
     }
 
+
+    public void kickRing(){
+        launcherServo.setPosition(kickPosition);
+    }
+
+
+    public void resetKicker(){
+        launcherServo.setPosition(resetPosition);
+    }
+
+
     public void adjustAimUp(){
         servoPosition += servoIncrement;
 
-        launcherServo.setPosition(servoPosition);
+        aimServo.setPosition(servoPosition);
     }
 
     public void adjustAimDown(){
         servoPosition -= servoIncrement;
 
-        launcherServo.setPosition(servoPosition);
+        aimServo.setPosition(servoPosition);
     }
 
-    public void shootLow(){
-        launcherServo.setPosition(lowShot);
+    public void setTowerLevel(int level){
+        if (level == 1){
+            shootLow();
+        }
+
+        if (level == 2){
+            shootMid();
+        }
+
+        if (level == 3){
+            shootHigh();
+        }
+    }
+
+    private void shootLow(){
+        aimServo.setPosition(lowShot);
     }
 
     public void shootMid(){
-        launcherServo.setPosition(midShot);
+        aimServo.setPosition(midShot);
     }
 
     public void shootHigh(){
-        launcherServo.setPosition(highShot);
+        aimServo.setPosition(highShot);
     }
 }

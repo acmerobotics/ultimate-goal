@@ -28,7 +28,14 @@ public class ShootBlueA extends Auto {
         robot.update();
 
         // shoot rings
-        Thread.sleep(3000);
+        robot.launcher.shootHigh();
+        robot.launcher.shoot();
+        robot.runForTime(1000);
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.launcher.shoot();
+        robot.update();
 
         robot.drive.moveForward((robot.len /2) + 1);
         robot.runUntil(robot.drive::atYPosition);
