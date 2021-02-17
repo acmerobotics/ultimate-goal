@@ -23,6 +23,10 @@ public class Launcher extends Subsystem {
     public double servoPosition = 0;
     public static double servoIncrement = 0.1;
 
+    public static double lowShot = 0;
+    public static double midShot = 0;
+    public static double highShot = 0;
+
 
     public Launcher(Robot robot) {
         super("Launcher");
@@ -53,9 +57,25 @@ public class Launcher extends Subsystem {
 
     public void adjustAimUp(){
         servoPosition += servoIncrement;
+
+        launcherServo.setPosition(servoPosition);
     }
 
     public void adjustAimDown(){
         servoPosition -= servoIncrement;
+
+        launcherServo.setPosition(servoPosition);
+    }
+
+    public void shootLow(){
+        launcherServo.setPosition(lowShot);
+    }
+
+    public void shootMid(){
+        launcherServo.setPosition(midShot);
+    }
+
+    public void shootHigh(){
+        launcherServo.setPosition(highShot);
     }
 }
