@@ -17,7 +17,8 @@ public class Launcher extends Subsystem {
 
     private boolean shooting = false;
 
-    public DcMotor launcherShooterMotor;
+    public DcMotor launcherShooterMotorFront;
+    public DcMotor launcherShooterMotorBack;
     public Servo aimServo;
     public Servo launcherServo;
 
@@ -35,9 +36,13 @@ public class Launcher extends Subsystem {
     public Launcher(Robot robot) {
         super("Launcher");
 
-        launcherShooterMotor = robot.getMotor("shooterMotor");
-        launcherShooterMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        launcherShooterMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        launcherShooterMotorFront = robot.getMotor("shooterMotorFront");
+        launcherShooterMotorFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcherShooterMotorFront.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        launcherShooterMotorBack = robot.getMotor("shooterMotorBack");
+        launcherShooterMotorBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcherShooterMotorBack.setDirection(DcMotorSimple.Direction.FORWARD);
 
         aimServo = robot.getServo("aimServo");
         launcherServo = robot.getServo("shooterServo");
@@ -54,10 +59,12 @@ public class Launcher extends Subsystem {
         shooting = !shooting;
 
         if (shooting){
-            launcherShooterMotor.setPower(1);
+            launcherShooterMotorFront.setPower(1);
+            launcherShooterMotorBack.setPower(1);
         }
         else{
-            launcherShooterMotor.setPower(0);
+            launcherShooterMotorFront.setPower(0);
+            launcherShooterMotorBack.setPower(1);
         }
     }
 
