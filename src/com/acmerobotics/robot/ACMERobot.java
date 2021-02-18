@@ -6,18 +6,19 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 public class ACMERobot extends Robot {
 
-//    public final Drive drive;
+    public final Drive drive;
     public final WobbleGoalSubSys wobbleGoal;
 
     public ACMERobot(LinearOpMode opMode){
         super(opMode);
 
-        registerHub("Expansion Hub 2");
+        registerHub("Expansion Hub 1");
+        registerHub("Expansion Hub 173");
 
-//        drive = new Drive(this, opMode);
+        drive = new Drive(this, opMode);
         wobbleGoal = new WobbleGoalSubSys(this, opMode);
 
-//        registerSubsystem(drive);
+        registerSubsytem(drive);
         registerSubsytem(wobbleGoal);
     }
 }
