@@ -14,6 +14,8 @@ public class TeleOp extends LinearOpMode {
     private boolean hold = false;
     private boolean lift = false;
 
+    private boolean isSlowMode = false;
+
     @Override
     public void runOpMode(){
 
@@ -25,8 +27,19 @@ public class TeleOp extends LinearOpMode {
 
         while (!isStopRequested()) {
 
-            Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-            robot.drive.setPower(v);
+            if (!isSlowMode) {
+                Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+                robot.drive.setPower(v);
+            }
+
+            else{
+                Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+                robot.drive.setSlowPower(v);
+            }
+
+            if (stickyGamepad.y){
+                isSlowMode = !isSlowMode;
+            }
 
             // press once to bring intake down and run wheels
             // press again to stop wheels
