@@ -11,6 +11,9 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
 public class TeleOp extends LinearOpMode {
 
+    private boolean hold = false;
+    private boolean lift = false;
+
     @Override
     public void runOpMode(){
 
@@ -26,7 +29,7 @@ public class TeleOp extends LinearOpMode {
             robot.drive.setPower(v);
 
             // press once to bring intake down and run wheels
-            // press again to stop wheels and bring intake up
+            // press again to stop wheels
             if (stickyGamepad.a) {
                 robot.intake.intakeRings();
             }
@@ -45,19 +48,43 @@ public class TeleOp extends LinearOpMode {
                 robot.launcher.resetKicker();
             }
 
-            robot.wobbleGoal.wobbleGoalArm(gamepad1.dpad_up, gamepad1.dpad_down);
-            robot.wobbleGoal.wobbleGoalHand(gamepad1.a);
+            // adjust aim to tower level
+            if (stickyGamepad.dpad_up){
+                robot.launcher.shootHigh();
+            }
+            if (stickyGamepad.dpad_down){
+                robot.launcher.shootMid();
+            }
+
+
+            if (stickyGamepad.b){
+                moveArm(robot);
+            }
+            if (stickyGamepad.right_bumper){
+                grab(robot);
+            }
 
             stickyGamepad.update();
             robot.update();
         }
     }
 
-    private void grab(){
 
+    private void grab(ACMERobot robot){
+        hold = !hold;
+
+        robot.wobbleGoal.wobbleGoalHand(hold);
     }
 
-    private void lift(){
+    private void moveArm(ACMERobot robot){
+        lift = !lift;
 
+        if (lift){
+            robot.wobbleGoal.wobbleGoalArm(false, true);
+        }
+
+        else {
+            robot.wobbleGoal.wobbleGoalArm(true, false);
+        }
     }
 }
