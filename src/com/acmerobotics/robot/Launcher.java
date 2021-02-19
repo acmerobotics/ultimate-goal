@@ -15,6 +15,8 @@ import java.util.ArrayList;
 @Config
 public class Launcher extends Subsystem {
 
+    public static double power = 0.975; // 1 for high, 0.825 for mid
+
     private boolean shooting = false;
 
     public DcMotor launcherShooterMotorFront;
@@ -28,6 +30,8 @@ public class Launcher extends Subsystem {
     public static double lowShot = 0.6;
     public static double midShot = 0.5;
     public static double highShot = 0.25;
+
+    public double servoAim = 0.6;
 
     public static double kickPosition = 1;
     public static double resetPosition = 0.75;
@@ -52,7 +56,7 @@ public class Launcher extends Subsystem {
     public void update(Canvas Overlay){
         telemetryData.addData("aimPosition", aimServo.getPosition());
         telemetryData.addData("kickerPosition", launcherServo.getPosition());
-        telemetryData.addData("shooting", shooting);
+        telemetryData.addData("shoot power", launcherShooterMotorFront.getPower());
     }
 
 
@@ -60,8 +64,8 @@ public class Launcher extends Subsystem {
         shooting = !shooting;
 
         if (shooting){
-            launcherShooterMotorFront.setPower(1);
-            launcherShooterMotorBack.setPower(1);
+            launcherShooterMotorFront.setPower(power);
+            launcherShooterMotorBack.setPower(power);
         }
         else{
             launcherShooterMotorFront.setPower(0);
@@ -92,29 +96,19 @@ public class Launcher extends Subsystem {
         aimServo.setPosition(servoPosition);
     }
 
-    public void setTowerLevel(int level){
-        if (level == 1){
-            shootLow();
-        }
-
-        if (level == 2){
-            shootMid();
-        }
-
-        if (level == 3){
-            shootHigh();
-        }
-    }
-
-    private void shootLow(){
-        aimServo.setPosition(lowShot);
-    }
-
     public void shootMid(){
-        aimServo.setPosition(midShot);
+        aimServo.setPosition(servoAim);
+        power = 0.825;
+
+        launcherShooterMotorFront.setPower(power);
+        launcherShooterMotorBack.setPower(power);
     }
 
     public void shootHigh(){
-        aimServo.setPosition(highShot);
+        aimServo.setPosition(servoAim);
+        power = 0.975;
+
+        launcherShooterMotorFront.setPower(power);
+        launcherShooterMotorBack.setPower(power);
     }
 }

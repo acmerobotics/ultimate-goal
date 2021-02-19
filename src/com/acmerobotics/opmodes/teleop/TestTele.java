@@ -36,7 +36,7 @@ public class TestTele extends LinearOpMode {
 //            }
 
             if (stickyGamepad.b){
-                robot.launcher.aimServo.setPosition(aimPosition);
+                robot.launcher.aimServo.setPosition(0.6);
             }
 
             // press a to start launcher motor, press a again to stop

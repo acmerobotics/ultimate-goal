@@ -13,7 +13,6 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 @TeleOp
 public class TestV1 extends LinearOpMode {
 
-    public int towerLevel = 3;
 
     @Override
     public void runOpMode(){
@@ -22,6 +21,8 @@ public class TestV1 extends LinearOpMode {
 
 //        FtcDashboard dashboard = FtcDashboard.getInstance();
 //        Telemetry dashboardTelemetry = dashboard.getTelemetry();
+
+        robot.launcher.aimServo.setPosition(robot.launcher.servoAim);
 
         waitForStart();
 
@@ -40,27 +41,15 @@ public class TestV1 extends LinearOpMode {
                 robot.launcher.resetKicker();
             }
 
-            // adjust aim in small increments
-            if (stickyGamepad.dpad_right){
-                robot.launcher.adjustAimUp();
-            }
-            if (stickyGamepad.dpad_left){
-                robot.launcher.adjustAimDown();
-            }
-
-            // change aim between towerLevels with dpad up and down
+            // adjust aim to tower level
             if (stickyGamepad.dpad_up){
-                towerLevel += 1;
-                Range.clip(towerLevel, 1, 3);
-                robot.launcher.setTowerLevel(towerLevel);
+                robot.launcher.shootHigh();
             }
             if (stickyGamepad.dpad_down){
-                towerLevel -= 1;
-                Range.clip(towerLevel, 1, 3);
-                robot.launcher.setTowerLevel(towerLevel);
+                robot.launcher.shootMid();
             }
 
-            telemetry.update();
+            //telemetry.update();
             stickyGamepad.update();
             robot.update();
         }

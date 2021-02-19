@@ -32,8 +32,32 @@ public class TeleOp extends LinearOpMode {
             }
 
 
+            // press a to start launcher motor, press a again to stop
+            if (stickyGamepad.x){
+                robot.launcher.shoot();
+            }
+
+            // press trigger to kick ring and launcher, release to reset kicker
+            if (gamepad1.right_trigger > 0.1){
+                robot.launcher.kickRing();
+            }
+            if (gamepad1.right_trigger <= 0.1){
+                robot.launcher.resetKicker();
+            }
+
+            robot.wobbleGoal.wobbleGoalArm(gamepad1.dpad_up, gamepad1.dpad_down);
+            robot.wobbleGoal.wobbleGoalHand(gamepad1.a);
+
             stickyGamepad.update();
             robot.update();
         }
+    }
+
+    private void grab(){
+
+    }
+
+    private void lift(){
+
     }
 }
