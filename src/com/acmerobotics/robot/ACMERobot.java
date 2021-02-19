@@ -13,10 +13,10 @@ public class ACMERobot extends Robot {
         super(opMode);
 
         registerHub("Expansion Hub 1");
-        registerHub("Expansion Hub 173");
+        registerHub("Control Hub");
 
         drive = new Drive(this, opMode);
-        wobbleGoal = new WobbleGoalSubSys(this, opMode);
+        wobbleGoal = new WobbleGoalSubSys(this);
 
         registerSubsytem(drive);
         registerSubsytem(wobbleGoal);

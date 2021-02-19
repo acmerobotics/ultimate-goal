@@ -3,7 +3,9 @@ package com.acmerobotics.opmodes.teleop;
 import com.acmerobotics.robomatic.util.StickyGamepad;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+@TeleOp
 public class WobbleGoalTest extends LinearOpMode {
 
     public void runOpMode(){
@@ -15,7 +17,9 @@ public class WobbleGoalTest extends LinearOpMode {
         while(!isStopRequested()){
 
             robot.wobbleGoal.wobbleGoalArm(gamepad1.dpad_up, gamepad1.dpad_down);
-            robot.wobbleGoal.wobbleGoalHand(stickyGamepad.a);
+            robot.wobbleGoal.wobbleGoalHand(gamepad1.a);
+
+            robot.update();
 
         }
     }

@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.Servo;
 
 public class WobbleGoalSubSys extends Subsystem {
-private LinearOpMode opMode;
 
 public Servo wobbleGoalLift;
 public double wobbleGoalUp ;
@@ -16,24 +15,23 @@ public Servo wobbleGoalHold;
 public double wobbleHold;
 public double  wobbleRelease;
 
-   public WobbleGoalSubSys(Robot robot, LinearOpMode opMode){
+   public WobbleGoalSubSys(Robot robot){
 super("WobbleGoalSubSys");
-
-this.opMode = opMode;
 
 wobbleGoalLift = robot.getServo("wobbleGoalLift");
 wobbleGoalHold = robot.getServo("wobbleGoalHold");
 
-// Not ready. Test this.
-   wobbleGoalUp = 3;
-   wobbleGoalDown = 2;
-   wobbleHold = 3;
-   wobbleRelease= 4;
+   wobbleGoalUp = 0.8;
+   wobbleGoalDown = 0.1;
+   wobbleHold = 0.28;
+   wobbleRelease= 0.8;
 
    }
 
     @Override
     public void update(Canvas fieldOverlay) {
+        telemetryData.addData("armPos", wobbleGoalLift.getPosition());
+        telemetryData.addData("handPos", wobbleGoalHold.getPosition());
 
     }
 
