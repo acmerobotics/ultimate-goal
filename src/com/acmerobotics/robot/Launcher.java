@@ -19,18 +19,18 @@ public class Launcher extends Subsystem {
 
     public DcMotor launcherShooterMotorFront;
     public DcMotor launcherShooterMotorBack;
-    public Servo aimServo;
+    public Servo aimServo; //the higher position the lower the aim will be
     public Servo launcherServo;
 
     public double servoPosition = 0;
     public static double servoIncrement = 0.05;
 
-    public static double lowShot = 0;
-    public static double midShot = 0;
-    public static double highShot = 0;
+    public static double lowShot = 0.6;
+    public static double midShot = 0.5;
+    public static double highShot = 0.25;
 
-    public static double kickPosition = 0;
-    public static double resetPosition = 0;
+    public static double kickPosition = 1;
+    public static double resetPosition = 0.75;
 
 
     public Launcher(Robot robot) {
@@ -38,11 +38,11 @@ public class Launcher extends Subsystem {
 
         launcherShooterMotorFront = robot.getMotor("shooterMotorFront");
         launcherShooterMotorFront.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        launcherShooterMotorFront.setDirection(DcMotorSimple.Direction.FORWARD);
+        launcherShooterMotorFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
         launcherShooterMotorBack = robot.getMotor("shooterMotorBack");
         launcherShooterMotorBack.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        launcherShooterMotorBack.setDirection(DcMotorSimple.Direction.FORWARD);
+        launcherShooterMotorBack.setDirection(DcMotorSimple.Direction.REVERSE);
 
         aimServo = robot.getServo("aimServo");
         launcherServo = robot.getServo("shooterServo");
@@ -52,6 +52,7 @@ public class Launcher extends Subsystem {
     public void update(Canvas Overlay){
         telemetryData.addData("aimPosition", aimServo.getPosition());
         telemetryData.addData("kickerPosition", launcherServo.getPosition());
+        telemetryData.addData("shooting", shooting);
     }
 
 
@@ -64,7 +65,7 @@ public class Launcher extends Subsystem {
         }
         else{
             launcherShooterMotorFront.setPower(0);
-            launcherShooterMotorBack.setPower(1);
+            launcherShooterMotorBack.setPower(0);
         }
     }
 
@@ -80,13 +81,13 @@ public class Launcher extends Subsystem {
 
 
     public void adjustAimUp(){
-        servoPosition += servoIncrement;
+        servoPosition -= servoIncrement;
 
         aimServo.setPosition(servoPosition);
     }
 
     public void adjustAimDown(){
-        servoPosition -= servoIncrement;
+        servoPosition += servoIncrement;
 
         aimServo.setPosition(servoPosition);
     }

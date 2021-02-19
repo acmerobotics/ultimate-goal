@@ -5,10 +5,12 @@ import com.acmerobotics.robomatic.robot.Robot;
 import com.acmerobotics.robomatic.util.StickyGamepad;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@TeleOp
 public class TestV1 extends LinearOpMode {
 
     public int towerLevel = 3;

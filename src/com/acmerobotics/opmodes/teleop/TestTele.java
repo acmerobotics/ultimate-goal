@@ -15,7 +15,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 public class TestTele extends LinearOpMode {
 
     public static double aimPosition = 0;
-    public static double kickerPosition = 0;
+    //public static double kickerPosition = 0;
 
     @Override
     public void runOpMode(){
@@ -30,16 +30,21 @@ public class TestTele extends LinearOpMode {
 
         while (!isStopRequested()) {
 
-            if (stickyGamepad.a){
-                robot.launcher.launcherServo.setPosition(aimPosition);
-            }
+
+//            if (stickyGamepad.a){
+//                robot.launcher.launcherServo.setPosition(aimPosition);
+//            }
 
             if (stickyGamepad.b){
-                robot.launcher.aimServo.setPosition(kickerPosition);
+                robot.launcher.aimServo.setPosition(aimPosition);
+            }
+
+            // press a to start launcher motor, press a again to stop
+            if (stickyGamepad.x){
+                robot.launcher.shoot();
             }
 
 
-            telemetry.update();
             stickyGamepad.update();
             robot.update();
         }

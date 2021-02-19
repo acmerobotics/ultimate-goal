@@ -40,7 +40,7 @@ public class RingDetector extends Subsystem {
         // set up parameters
         parameters.vuforiaLicenseKey = KEY;
 //        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
-        parameters.cameraName = hardwareMap.get(WebcamName.class, "webCam");
+        parameters.cameraName = hardwareMap.get(WebcamName.class, "Webcam 1");
 
         // create vuforia instance
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
