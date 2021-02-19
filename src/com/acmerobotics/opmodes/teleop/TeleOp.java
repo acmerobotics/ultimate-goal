@@ -34,8 +34,6 @@ public class TeleOp extends LinearOpMode {
 
             stickyGamepad.update();
             robot.update();
-
-            telemetry.update();
         }
     }
 }
