@@ -23,6 +23,8 @@ public class TeleOp extends LinearOpMode {
 
         ACMERobot robot = new ACMERobot(this);
 
+        robot.launcher.aimServo.setPosition(0.6);
+
         waitForStart();
 
         while (!isStopRequested()) {
@@ -62,11 +64,19 @@ public class TeleOp extends LinearOpMode {
             }
 
             // adjust aim to tower level
-            if (stickyGamepad.dpad_up){
+            if (stickyGamepad.dpad_right){
                 robot.launcher.shootHigh();
             }
+            if (stickyGamepad.dpad_left){
+                robot.launcher.shootLow();
+            }
+
+            // adjust aim with power
+            if (stickyGamepad.dpad_up){
+                robot.launcher.adjustAimUp();
+            }
             if (stickyGamepad.dpad_down){
-                robot.launcher.shootMid();
+                robot.launcher.adjustAimDown();
             }
 
 
