@@ -32,6 +32,11 @@ public class Launcher extends Subsystem {
     public static double kickPosition = 1;
     public static double resetPosition = 0.75;
 
+    private static double TICKS_PER_REV = 25;
+    private static double MAX_RPM = 6000;
+
+    RPMTool rpmTool;
+
 
     public Launcher(Robot robot) {
         super("Launcher");
@@ -46,6 +51,8 @@ public class Launcher extends Subsystem {
 
         aimServo = robot.getServo("aimServo");
         launcherServo = robot.getServo("shooterServo");
+
+        rpmTool = new RPMTool(launcherShooterMotorBack, TICKS_PER_REV);
     }
 
     @Override
@@ -53,6 +60,7 @@ public class Launcher extends Subsystem {
         telemetryData.addData("aimPosition", aimServo.getPosition());
         telemetryData.addData("kickerPosition", launcherServo.getPosition());
         telemetryData.addData("shoot power", launcherShooterMotorFront.getPower());
+        telemetryData.addData("velocity back motor", rpmTool.getRPM());
     }
 
 
@@ -122,5 +130,9 @@ public class Launcher extends Subsystem {
 
         launcherShooterMotorFront.setPower(power);
         launcherShooterMotorBack.setPower(power);
+    }
+
+    public boolean isMaxVelocity() {
+        return (rpmTool.getRPM() >= (MAX_RPM - 500));
     }
 }

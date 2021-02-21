@@ -29,8 +29,7 @@ public class ShootBlueB extends Auto {
 
         // shoot rings
         robot.launcher.shootHigh();
-        robot.launcher.shoot();
-        robot.runForTime(1000);
+        robot.runUntil(robot.launcher::isMaxVelocity);
         robot.shootRingA();
         robot.shootRingA();
         robot.shootRingA();

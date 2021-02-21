@@ -17,6 +17,10 @@ public class ACMERobot extends Robot {
     public double len = 17.4;
     public double width = 18;
     public double errorMargin = 4;
+
+    private boolean hold = false;
+    private boolean lift = false;
+
     public ACMERobot(LinearOpMode opMode){
         super(opMode);
 
@@ -42,5 +46,41 @@ public class ACMERobot extends Robot {
         launcher.resetKicker();
         runForTime(1000);
 
+    }
+
+    public void grab(){
+        hold = !hold;
+
+        wobbleGoal.wobbleGoalHand(hold);
+    }
+
+    public void moveArm(){
+        lift = !lift;
+
+        if (lift){
+            wobbleGoal.wobbleGoalArm(false, true);
+        }
+
+        else {
+            wobbleGoal.wobbleGoalArm(true, false);
+        }
+    }
+
+    public void dropWobble(){
+        drive.stopMotors();
+        update();
+        moveArm();
+        runForTime(1000);
+        grab();
+        runForTime(1000);
+        drive.moveBack(6);
+        runUntil(drive::atYPosition);
+        drive.stopMotors();
+        update();
+        moveArm();
+        runForTime(1000);
+        drive.moveForward(6);
+        runUntil(drive::atYPosition);
+        drive.stopMotors();
     }
 }

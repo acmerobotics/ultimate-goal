@@ -12,31 +12,36 @@ public class WobbleBlueA extends Auto {
 
         ACMERobot robot = new ACMERobot(this);
 
+        // grab wobble
+        robot.grab();
+        robot.update();
+
         // TO_RINGS
-        robot.drive.moveForward(46 - robot.len);
+        robot.drive.moveForward(14);
         robot.runUntil(robot.drive::atYPosition);
-
-
-        // TURN_TO_RINGS
-        robot.drive.turnRight(90);
-        robot.runUntil(robot.drive::atTurningPosition);
 
 
         // DETECT_RINGS
         robot.drive.stopMotors();
         robot.ringDetector.startDetecting();
-        robot.runForTime(3000);
+        robot.runForTime(1000);
         robot.ringDetector.stopDetecting();
-        robot.runForTime(500);
+        robot.update();
+        telemetry.addData("rings detected", robot.ringDetector.detectedRings());
+        telemetry.update();
 
-        // TURN_BACK
-        robot.drive.turnLeft(90);
-        robot.runUntil(robot.drive::atTurningPosition);
+        // AVOID RING
+        robot.drive.strafeLeft(5);
+        robot.runUntil(robot.drive::atStrafePosition);
 
 
         // MOVE_TO_LINE
-        robot.drive.moveForward(34);
+        robot.drive.moveForward(34 + 14);
         robot.runUntil(robot.drive::atYPosition);
+
+        // UNDO AVOID RING
+        robot.drive.strafeRight(5);
+        robot.runUntil(robot.drive::atStrafePosition);
 
 
         // DETERMINE_TARGET_ZONE
@@ -58,27 +63,25 @@ public class WobbleBlueA extends Auto {
             robot.drive.moveForward(8);
             robot.runUntil(robot.drive::atYPosition);
 
-            robot.drive.turnLeft(45);
+            robot.drive.turnLeft(40);
             robot.runUntil(robot.drive::atTurningPosition);
 
             // drop wobble
-            robot.drive.stopMotors();
-            robot.runForTime(3000);
+            robot.dropWobble();
 
-            robot.drive.turnRight(45);
+            robot.drive.turnRight(40);
             robot.runUntil(robot.drive::atTurningPosition);
         }
 
         if (targetZone == TargetZone.B){
-            robot.drive.moveForward(24 + 8);
+            robot.drive.moveForward(24 + 2);
             robot.runUntil(robot.drive::atYPosition);
 
             robot.drive.turnRight(45);
             robot.runUntil(robot.drive::atTurningPosition);
 
             // drop wobble
-            robot.drive.stopMotors();
-            robot.runForTime(3000);
+            robot.dropWobble();
 
             robot.drive.turnLeft(45);
             robot.runUntil(robot.drive::atTurningPosition);
@@ -88,32 +91,31 @@ public class WobbleBlueA extends Auto {
             robot.drive.moveForward(48 + 6); // 48
             robot.runUntil(robot.drive::atYPosition);
 
-            robot.drive.turnLeft(45);
+            robot.drive.turnLeft(40);
             robot.runUntil(robot.drive::atTurningPosition);
 
             // drop wobble
-            robot.drive.stopMotors();
-            robot.runForTime(3000);
+            robot.dropWobble();
 
-            robot.drive.turnRight(45);
+            robot.drive.turnRight(25);
             robot.runUntil(robot.drive::atTurningPosition);
         }
 
 
         // PARK
         if (targetZone == TargetZone.A){
-            robot.drive.moveForward(18);
+            robot.drive.moveForward(6);
             robot.runUntil(robot.drive::atYPosition);
         }
 
         if (targetZone == TargetZone.B){
-            robot.drive.moveBack(18);
+            robot.drive.moveBack(10);
             robot.runUntil(robot.drive::atYPosition);
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.moveBack(48 - 18);
-            robot.runUntil(robot.drive::atStrafePosition);
+            robot.drive.moveBack(45);
+            robot.runUntil(robot.drive::atYPosition);
         }
 
 

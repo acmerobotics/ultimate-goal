@@ -20,10 +20,12 @@ public class Park extends LinearOpMode {
 
         // might add a strafe to get out of the way of the autos of others in the future
 
-       robot.drive.moveForward(80 - (robot.len / 2));
+       robot.drive.moveForward(84 - (robot.len / 2));
 
        robot.runUntil(robot.drive::atYPosition);
 
         robot.drive.stopMotors();
+
+        robot.runUntilStop();
     }
 }

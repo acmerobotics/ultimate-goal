@@ -42,15 +42,15 @@ public class RPMTool {
     // keep track ticks per sec
     public double ticksPerSec(){
 
-        if (Time > 1){
-            lastTicks = motor.getCurrentPosition();
-            lastTime = time.seconds();
-        }
-
         ticks = motor.getCurrentPosition() - lastTicks;
         Time = time.seconds() - lastTime;
 
         double tickVelocity = ticks / Time;
+
+        if (Time > 1){
+            lastTicks = motor.getCurrentPosition();
+            lastTime = time.seconds();
+        }
 
         return tickVelocity;
     }

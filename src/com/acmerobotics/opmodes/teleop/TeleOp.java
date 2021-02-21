@@ -11,9 +11,6 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
 public class TeleOp extends LinearOpMode {
 
-    private boolean hold = false;
-    private boolean lift = false;
-
     private boolean isSlowMode = false;
 
     @Override
@@ -81,33 +78,14 @@ public class TeleOp extends LinearOpMode {
 
 
             if (stickyGamepad.b){
-                moveArm(robot);
+                robot.moveArm();
             }
             if (stickyGamepad.right_bumper){
-                grab(robot);
+                robot.grab();
             }
 
             stickyGamepad.update();
             robot.update();
-        }
-    }
-
-
-    private void grab(ACMERobot robot){
-        hold = !hold;
-
-        robot.wobbleGoal.wobbleGoalHand(hold);
-    }
-
-    private void moveArm(ACMERobot robot){
-        lift = !lift;
-
-        if (lift){
-            robot.wobbleGoal.wobbleGoalArm(false, true);
-        }
-
-        else {
-            robot.wobbleGoal.wobbleGoalArm(true, false);
         }
     }
 }
