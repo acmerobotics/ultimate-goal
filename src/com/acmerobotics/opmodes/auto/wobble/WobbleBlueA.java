@@ -13,8 +13,8 @@ public class WobbleBlueA extends Auto {
         ACMERobot robot = new ACMERobot(this);
 
         // grab wobble
-        robot.grab();
-        robot.update();
+        robot.wobbleGoal.wobbleGoalHandLoose();
+        robot.runForTime(500);
 
         // TO_RINGS
         robot.drive.moveForward(14);
@@ -74,7 +74,7 @@ public class WobbleBlueA extends Auto {
         }
 
         if (targetZone == TargetZone.B){
-            robot.drive.moveForward(24 + 2);
+            robot.drive.moveForward(24);
             robot.runUntil(robot.drive::atYPosition);
 
             robot.drive.turnRight(45);

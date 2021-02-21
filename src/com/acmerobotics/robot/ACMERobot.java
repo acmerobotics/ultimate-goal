@@ -71,16 +71,9 @@ public class ACMERobot extends Robot {
         update();
         moveArm();
         runForTime(1000);
-        grab();
+        wobbleGoal.setWobbleGoalRelease();
         runForTime(1000);
-        drive.moveBack(6);
-        runUntil(drive::atYPosition);
-        drive.stopMotors();
-        update();
         moveArm();
-        runForTime(1000);
-        drive.moveForward(6);
-        runUntil(drive::atYPosition);
-        drive.stopMotors();
+        runForTime(500);
     }
 }

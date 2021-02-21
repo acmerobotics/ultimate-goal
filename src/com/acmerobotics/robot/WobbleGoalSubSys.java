@@ -23,7 +23,7 @@ wobbleGoalHold = robot.getServo("wobbleGoalHold");
 
    wobbleGoalUp = 0.8;
    wobbleGoalDown = 0.1;
-   wobbleHold = 0.28;
+   wobbleHold = 0.3; // 0.28
    wobbleRelease= 0.8;
 
    }
@@ -55,4 +55,12 @@ public void wobbleGoalHand(boolean a){
      wobbleGoalHold.setPosition(wobbleRelease);
    }
 }
+
+    public void wobbleGoalHandLoose(){
+       wobbleGoalHold.setPosition(0.3); // loose hold on wobble so when it comes down during auto it wont get stuck and carried
+    }
+
+    public void setWobbleGoalRelease(){
+       wobbleGoalHold.setPosition(wobbleRelease);
+    }
 }
