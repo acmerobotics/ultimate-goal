@@ -3,7 +3,9 @@ package com.acmerobotics.opmodes.auto.wobble;
 import com.acmerobotics.opmodes.auto.Auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 @Autonomous(group = "Wobble")
 public class WobbleRedA extends Auto {
     @Override

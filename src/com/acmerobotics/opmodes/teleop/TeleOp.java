@@ -20,7 +20,7 @@ public class TeleOp extends LinearOpMode {
 
         ACMERobot robot = new ACMERobot(this);
 
-        robot.launcher.aimServo.setPosition(0.6);
+        robot.launcher.aimServo.setPosition(robot.launcher.servoAim);
 
         waitForStart();
 

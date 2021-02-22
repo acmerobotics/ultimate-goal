@@ -1,6 +1,7 @@
 package com.acmerobotics.opmodes.teleop;
 
 import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.robomatic.robot.Robot;
 import com.acmerobotics.robomatic.util.StickyGamepad;
 import com.acmerobotics.robot.ACMERobot;
@@ -10,8 +11,11 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
+@Config
 @TeleOp
 public class TestV1 extends LinearOpMode {
+
+    public static double aimPosition = 0.75;
 
 
     @Override
@@ -29,6 +33,10 @@ public class TestV1 extends LinearOpMode {
         while (!isStopRequested()) {
 
             // press a to start launcher motor, press a again to stop
+            if (stickyGamepad.b){
+                robot.launcher.aimServo.setPosition(aimPosition);
+            }
+
             if (stickyGamepad.x){
                 robot.launcher.shoot();
             }

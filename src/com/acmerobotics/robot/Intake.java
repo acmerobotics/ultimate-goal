@@ -28,7 +28,7 @@ public class Intake extends Subsystem {
 
     @Override
     public void update(Canvas overlay){
-
+        telemetryData.addData("motor power", intakeMotor.getPower());
     }
 
 

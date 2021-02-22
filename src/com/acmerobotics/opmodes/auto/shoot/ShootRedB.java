@@ -3,7 +3,9 @@ package com.acmerobotics.opmodes.auto.shoot;
 import com.acmerobotics.opmodes.auto.Auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 @Autonomous(group = "shoot")
 public class ShootRedB extends Auto {
 

@@ -3,7 +3,9 @@ package com.acmerobotics.opmodes.auto.combined;
 import com.acmerobotics.opmodes.auto.Auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 @Autonomous(group = "Combined")
 public class CombinedRedA extends Auto {
 
