@@ -125,12 +125,12 @@ public class CombinedBlueB extends Auto {
         }
 
         if (targetZone == TargetZone.B){
-            robot.drive.moveBack(34);
+            robot.drive.moveBack(35);
             robot.runUntil(robot.drive::atYPosition);
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.moveBack(54);
+            robot.drive.moveBack(63);
             robot.runUntil(robot.drive::atYPosition);
         }
 
@@ -153,6 +153,9 @@ public class CombinedBlueB extends Auto {
             robot.drive.strafeRight(10);
             robot.runUntil(robot.drive::atStrafePosition);
         }
+        telemetry.addData("x pos" , robot.drive.omniTrackerX.getCurrentPosition());
+        telemetry.addData("x target" , robot.drive.target);
+        telemetry.update();
 
 
         // ADJUST_AIM

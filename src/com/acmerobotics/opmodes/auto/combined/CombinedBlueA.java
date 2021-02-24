@@ -117,17 +117,17 @@ public class CombinedBlueA extends Auto {
 
         // MOVE_BEHIND_LINE (will probably need to add more to the move back amount to ensure the robot is behind line)
         if (targetZone == TargetZone.A){
-            robot.drive.moveBack(13);
+            robot.drive.moveBack(20);
             robot.runUntil(robot.drive::atYPosition);
         }
 
         if (targetZone == TargetZone.B){
-            robot.drive.moveBack(18);
+            robot.drive.moveBack(24);
             robot.runUntil(robot.drive::atYPosition);
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.moveBack(59);
+            robot.drive.moveBack(63);
             robot.runUntil(robot.drive::atYPosition);
         }
 
@@ -144,7 +144,7 @@ public class CombinedBlueA extends Auto {
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.strafeRight(6);
+            robot.drive.strafeRight(8);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 

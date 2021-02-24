@@ -60,20 +60,20 @@ public class TeleOp extends LinearOpMode {
                 robot.launcher.resetKicker();
             }
 
+//            // adjust aim to tower level
+//            if (stickyGamepad.dpad_right){
+//                robot.launcher.shootHigh();
+//            }
+//            if (stickyGamepad.dpad_left){
+//                robot.launcher.shootMid();
+//            }
+
             // adjust aim to tower level
-            if (stickyGamepad.dpad_right){
+            if (stickyGamepad.dpad_up){
                 robot.launcher.shootHigh();
             }
-            if (stickyGamepad.dpad_left){
-                robot.launcher.shootLow();
-            }
-
-            // adjust aim with power
-            if (stickyGamepad.dpad_up){
-                robot.launcher.adjustAimUp();
-            }
             if (stickyGamepad.dpad_down){
-                robot.launcher.adjustAimDown();
+                robot.launcher.shootMid();
             }
 
 
