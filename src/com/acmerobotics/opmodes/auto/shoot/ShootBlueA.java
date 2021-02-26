@@ -12,6 +12,9 @@ public class ShootBlueA extends Auto {
 
         ACMERobot robot = new ACMERobot(this);
 
+        robot.intake.moveServo();
+        robot.update();
+
         robot.drive.moveForward(80 - (robot.len + robot.errorMargin));
         robot.runUntil(robot.drive::atYPosition);
 

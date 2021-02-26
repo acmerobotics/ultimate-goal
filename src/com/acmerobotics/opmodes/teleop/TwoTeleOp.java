@@ -1,22 +1,23 @@
 package com.acmerobotics.opmodes.teleop;
 
 import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.robomatic.robot.Robot;
 import com.acmerobotics.robomatic.util.StickyGamepad;
 import com.acmerobotics.robot.ACMERobot;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@com.qualcomm.robotcore.eventloop.opmode.TeleOp(name="TeleOp")
-public class TeleOp extends LinearOpMode {
+@Disabled
+@TeleOp
+public class TwoTeleOp extends LinearOpMode {
 
     private boolean isSlowMode = false;
 
     @Override
     public void runOpMode(){
 
-        StickyGamepad stickyGamepad = new StickyGamepad(gamepad1);
+        StickyGamepad stickyGamepad1 = new StickyGamepad(gamepad1);
+        StickyGamepad stickyGamepad = new StickyGamepad(gamepad2);
 
         ACMERobot robot = new ACMERobot(this);
 
@@ -44,18 +45,14 @@ public class TeleOp extends LinearOpMode {
                 robot.drive.setSlowPower(v);
             }
 
-            if (stickyGamepad.y){
+            if (stickyGamepad1.y){
                 isSlowMode = !isSlowMode;
             }
 
             // press once to bring intake down and run wheels
             // press again to stop wheels
-            if (stickyGamepad.a) {
+            if (stickyGamepad1.a) {
                 robot.intake.intakeRings();
-            }
-            // reverse power in case of stuck ring
-            if (gamepad1.left_trigger > 0.1){
-                robot.intake.reverseIntake(gamepad1.left_trigger);
             }
 
 
@@ -65,10 +62,10 @@ public class TeleOp extends LinearOpMode {
             }
 
             // press trigger to kick ring and launcher, release to reset kicker
-            if (gamepad1.right_trigger > 0.1){
+            if (gamepad2.right_trigger > 0.1){
                 robot.launcher.kickRing();
             }
-            if (gamepad1.right_trigger <= 0.1){
+            if (gamepad2.right_trigger <= 0.1){
                 robot.launcher.resetKicker();
             }
 
@@ -97,6 +94,7 @@ public class TeleOp extends LinearOpMode {
             }
 
             stickyGamepad.update();
+            stickyGamepad1.update();
             robot.update();
         }
     }

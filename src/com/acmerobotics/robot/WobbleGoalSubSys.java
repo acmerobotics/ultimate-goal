@@ -14,6 +14,7 @@ public double wobbleGoalDown;
 public Servo wobbleGoalHold;
 public double wobbleHold;
 public double  wobbleRelease;
+public static double wobbleLiftHigh;
 
    public WobbleGoalSubSys(Robot robot){
 super("WobbleGoalSubSys");
@@ -25,6 +26,7 @@ wobbleGoalHold = robot.getServo("wobbleGoalHold");
    wobbleGoalDown = 0.1;
    wobbleHold = 0.3; // 0.28
    wobbleRelease= 0.8;
+   wobbleLiftHigh = 0.5;
 
    }
 
@@ -62,5 +64,9 @@ public void wobbleGoalHand(boolean a){
 
     public void setWobbleGoalRelease(){
        wobbleGoalHold.setPosition(wobbleRelease);
+    }
+
+    public void wobbleHigh(){
+        wobbleGoalLift.setPosition(wobbleLiftHigh);
     }
 }

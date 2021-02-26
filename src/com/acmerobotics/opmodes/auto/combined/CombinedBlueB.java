@@ -12,6 +12,9 @@ public class CombinedBlueB extends Auto {
 
         ACMERobot robot = new ACMERobot(this);
 
+        robot.intake.moveServo();
+        robot.update();
+
         // grab wobble
         robot.wobbleGoal.wobbleGoalHandLoose();
         robot.runForTime(500);

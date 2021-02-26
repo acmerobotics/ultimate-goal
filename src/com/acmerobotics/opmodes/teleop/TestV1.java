@@ -27,6 +27,7 @@ public class TestV1 extends LinearOpMode {
 //        Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
         robot.launcher.aimServo.setPosition(robot.launcher.servoAim);
+        robot.update();
 
         waitForStart();
 
@@ -51,7 +52,8 @@ public class TestV1 extends LinearOpMode {
 
             // adjust aim to tower level
             if (stickyGamepad.dpad_up){
-                robot.launcher.shootHigh();
+                //robot.intake.moveServo(); //////////////////////////////
+                robot.intake.intakeServo.setPosition(robot.intake.servoPosHold);
             }
             if (stickyGamepad.dpad_down){
                 robot.launcher.shootMid();

@@ -17,18 +17,32 @@ public class Intake extends Subsystem {
 
     private DcMotorEx intakeMotor;
 
+    public Servo intakeServo;
+
     private boolean runIntake = false;
+
+    public static double servoPosRelease = 0.4;
+    public static double servoPosHold = 0.2;
+    private boolean releaseServo = true;
 
     public Intake(Robot robot){
         super("Intake");
 
         intakeMotor = robot.getMotor("intakeMotor");
         intakeMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        intakeServo = robot.getServo("intakeServo");
     }
 
     @Override
     public void update(Canvas overlay){
         telemetryData.addData("motor power", intakeMotor.getPower());
+        telemetryData.addData("servo pos", intakeServo.getPosition());
+
+    }
+
+    public void reverseIntake(double power){
+        intakeMotor.setPower(-power);
     }
 
 
@@ -43,6 +57,19 @@ public class Intake extends Subsystem {
         else{
 
             intakeMotor.setPower(0);
+        }
+    }
+
+    public void moveServo(){
+        releaseServo = !releaseServo;
+
+        if (releaseServo){
+
+            intakeServo.setPosition(servoPosRelease);
+        }
+        else{
+
+            intakeServo.setPosition(servoPosHold);
         }
     }
 
