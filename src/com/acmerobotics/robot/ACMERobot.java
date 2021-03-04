@@ -2,6 +2,7 @@ package com.acmerobotics.robot;
 
 import com.acmerobotics.robomatic.robot.Robot;
 import com.acmerobotics.vision.RingDetector;
+import com.acmerobotics.vision.vuforiaSubsystem;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
@@ -12,7 +13,7 @@ public class ACMERobot extends Robot {
     public final RingDetector ringDetector;
     public final Launcher launcher; // adjust Launcher Version HERE!
     public final WobbleGoalSubSys wobbleGoal;
-
+    public final vuforiaSubsystem vuforiaSubsystem;
 
     public double len = 17.4;
     public double width = 18;
@@ -32,7 +33,9 @@ public class ACMERobot extends Robot {
         ringDetector = new RingDetector(opMode.hardwareMap);
         launcher = new Launcher(this);
         wobbleGoal = new WobbleGoalSubSys(this);
+        vuforiaSubsystem = new vuforiaSubsystem(this, opMode);
 
+        registerSubsytem(vuforiaSubsystem);
         registerSubsytem(drive);
         registerSubsytem(intake);
         registerSubsytem(ringDetector);
