@@ -7,7 +7,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-@Disabled
 @TeleOp
 public class TwoTeleOp extends LinearOpMode {
 
@@ -53,6 +52,13 @@ public class TwoTeleOp extends LinearOpMode {
             // press again to stop wheels
             if (stickyGamepad1.a) {
                 robot.intake.intakeRings();
+            }
+            // reverse power in case of stuck ring
+            if (gamepad1.left_trigger > 0.1){
+                robot.intake.reverseIntake(gamepad1.left_trigger);
+            }
+            else{
+                robot.intake.reverseIntake(0);
             }
 
 

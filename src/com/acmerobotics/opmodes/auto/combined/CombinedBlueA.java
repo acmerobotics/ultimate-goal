@@ -137,17 +137,17 @@ public class CombinedBlueA extends Auto {
 
         // STRAFE_TO_TOWER
         if (targetZone == TargetZone.A){
-            robot.drive.strafeRight(10);
+            robot.drive.strafeRight(15); //13
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
         if (targetZone == TargetZone.B){
-            robot.drive.strafeRight(10);
+            robot.drive.strafeRight(12);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.strafeRight(8);
+            robot.drive.strafeRight(10);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
