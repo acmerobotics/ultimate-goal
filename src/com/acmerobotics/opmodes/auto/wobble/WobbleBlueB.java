@@ -12,46 +12,73 @@ public class WobbleBlueB extends Auto {
 
         ACMERobot robot = new ACMERobot(this);
 
+        // grab wobble
+        robot.wobbleGoal.wobbleGoalHandLoose();
+        robot.runForTime(500);
+
         // TO_RINGS
-        robot.drive.moveForward(46 - robot.len);
+        robot.drive.moveForward(14);
         robot.runUntil(robot.drive::atYPosition);
-
-
-        // TURN_TO_RINGS
-        robot.drive.turnLeft(90);
+        robot.drive.turnLeft(30);
         robot.runUntil(robot.drive::atTurningPosition);
 
 
         // DETECT_RINGS
         robot.drive.stopMotors();
-        robot.runForTime(3000);
+        robot.ringDetector.startDetecting();
+        robot.runForTime(1000);
+        robot.ringDetector.stopDetecting();
+        robot.update();
+        telemetry.addData("rings detected", robot.ringDetector.detectedRings());
+        telemetry.update();
 
         // TURN_BACK
-        robot.drive.turnRight(90);
+        robot.drive.turnRight(30);
         robot.runUntil(robot.drive::atTurningPosition);
 
+        // AVOID RING
+        robot.drive.strafeRight(5);
+        robot.runUntil(robot.drive::atStrafePosition);
 
-        // MOVE_TO_Line
-        robot.drive.moveForward(34);
+
+        // MOVE_TO_LINE
+        robot.drive.moveForward(34 + 14);
         robot.runUntil(robot.drive::atYPosition);
+
+        // UNDO AVOID RING
+        robot.drive.strafeLeft(5);
+        robot.runUntil(robot.drive::atStrafePosition);
+
+
+        // DETERMINE_TARGET_ZONE
+        if (robot.ringDetector.detectedRings() == 0){
+            targetZone = TargetZone.A;
+        }
+
+        else if (robot.ringDetector.detectedRings() == 1){
+            targetZone = TargetZone.B;
+        }
+
+        else{
+            targetZone = TargetZone.C;
+        }
 
 
         // MOVE_TO_SQUARE
         if (targetZone == TargetZone.A){
-            robot.drive.strafeLeft(24); // check if it is more efficient to do a 180 turn + 180 turn or strafe 24 in
+            robot.drive.strafeLeft(23);
             robot.runUntil(robot.drive::atStrafePosition);
 
-            robot.drive.moveForward(24);
+            robot.drive.moveForward(20);
             robot.runUntil(robot.drive::atYPosition);
 
-            robot.drive.turnLeft(45);
+            robot.drive.turnLeft(55);
             robot.runUntil(robot.drive::atTurningPosition);
 
             // drop wobble
-            robot.drive.stopMotors();
-            robot.runForTime(3000);
+            robot.dropWobble();
 
-            robot.drive.turnRight(45);
+            robot.drive.turnRight(55);
             robot.runUntil(robot.drive::atTurningPosition);
         }
 
@@ -59,19 +86,21 @@ public class WobbleBlueB extends Auto {
             robot.drive.moveForward(24 + 6);
             robot.runUntil(robot.drive::atYPosition);
 
-            robot.drive.turnLeft(45);
+            robot.drive.strafeLeft(6);
+            robot.runUntil(robot.drive::atStrafePosition);
+
+            robot.drive.turnLeft(35);
             robot.runUntil(robot.drive::atTurningPosition);
 
             // drop wobble
-            robot.drive.stopMotors();
-            robot.runForTime(3000);
+            robot.dropWobble();
 
-            robot.drive.turnRight(45);
+            robot.drive.turnRight(35);
             robot.runUntil(robot.drive::atTurningPosition);
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.moveForward(48 + 6);
+            robot.drive.moveForward(48 + 8); // 48 + 6
             robot.runUntil(robot.drive::atYPosition);
 
             robot.drive.strafeLeft(22); // check if it is more efficient to do a 180 turn + 180 turn or strafe 24 in
@@ -81,8 +110,7 @@ public class WobbleBlueB extends Auto {
             robot.runUntil(robot.drive::atTurningPosition);
 
             // drop wobble
-            robot.drive.stopMotors();
-            robot.runForTime(3000);
+            robot.dropWobble();
 
             robot.drive.turnRight(45);
             robot.runUntil(robot.drive::atTurningPosition);
@@ -91,17 +119,17 @@ public class WobbleBlueB extends Auto {
 
         // PARK
         if (targetZone == TargetZone.A){
-            robot.drive.moveForward(18);
+            robot.drive.moveForward(0);
             robot.runUntil(robot.drive::atYPosition);
         }
 
         if (targetZone == TargetZone.B){
-            robot.drive.moveBack(18);
+            robot.drive.moveBack(15);
             robot.runUntil(robot.drive::atYPosition);
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.moveBack(48 - 18);
+            robot.drive.moveBack(40);
             robot.runUntil(robot.drive::atYPosition);
         }
 

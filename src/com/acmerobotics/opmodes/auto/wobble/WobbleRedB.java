@@ -3,7 +3,9 @@ package com.acmerobotics.opmodes.auto.wobble;
 import com.acmerobotics.opmodes.auto.Auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 @Autonomous(group = "Wobble")
 public class WobbleRedB extends Auto {
 
@@ -24,7 +26,10 @@ public class WobbleRedB extends Auto {
 
         // DETECT_RINGS
         robot.drive.stopMotors();
+        robot.ringDetector.startDetecting();
         robot.runForTime(3000);
+        robot.ringDetector.stopDetecting();
+        robot.runForTime(500);
 
 
         // TURN_BACK
@@ -32,9 +37,23 @@ public class WobbleRedB extends Auto {
         robot.runUntil(robot.drive::atTurningPosition);
 
 
-        // MOVE_TO_Line
+        // MOVE_TO_LINE
         robot.drive.moveForward(34);
         robot.runUntil(robot.drive::atYPosition);
+
+
+        // DETERMINE_TARGET_ZONE
+        if (robot.ringDetector.detectedRings() == 0){
+            targetZone = TargetZone.A;
+        }
+
+        else if (robot.ringDetector.detectedRings() == 1){
+            targetZone = TargetZone.B;
+        }
+
+        else{
+            targetZone = TargetZone.C;
+        }
 
 
         // MOVE_TO_SQUARE

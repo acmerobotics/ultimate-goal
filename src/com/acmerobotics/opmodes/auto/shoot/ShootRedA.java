@@ -3,7 +3,9 @@ package com.acmerobotics.opmodes.auto.shoot;
 import com.acmerobotics.opmodes.auto.Auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 @Autonomous(group = "shoot")
 public class ShootRedA extends Auto {
 
@@ -27,7 +29,14 @@ public class ShootRedA extends Auto {
         robot.update();
 
         // shoot rings
-        Thread.sleep(3000);
+        robot.launcher.shootHigh();
+        robot.launcher.shoot();
+        robot.runForTime(1000);
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.launcher.shoot();
+        robot.update();
 
         robot.drive.moveForward((robot.len /2) + 2);
         robot.runUntil(robot.drive::atYPosition);
