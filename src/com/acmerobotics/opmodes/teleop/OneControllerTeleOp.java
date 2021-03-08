@@ -20,9 +20,7 @@ public class OneControllerTeleOp extends LinearOpMode {
 
         ACMERobot robot = new ACMERobot(this);
 
-
         waitForStart();
-
 
         while(!isStopRequested()){
 
@@ -46,8 +44,8 @@ public class OneControllerTeleOp extends LinearOpMode {
                         state = 2;
                     }
 
+                    
                     break;
-
 
                 case 2:
 
@@ -58,15 +56,12 @@ public class OneControllerTeleOp extends LinearOpMode {
                     }
 
 
-
             }
 
             telemetry.addData("Gamepad State:", state);
 
-
             stickyGamepad1.update();
             robot.update();
-
             telemetry.update();
 
 
