@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.util.RobotLog;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -48,6 +49,8 @@ public class vuforiaSubsystem extends Subsystem {
     OpenGLMatrix cameraLocationOnRobot;
 
     public VuforiaTrackables ultimateGoal;
+
+    VectorF translation;
 
     private LinearOpMode opMode;
 
@@ -127,29 +130,33 @@ public class vuforiaSubsystem extends Subsystem {
 
             if (robotLocationTransform != null) {
                 location = robotLocationTransform;
+                translation = location.getTranslation();
             }
+
+
 
         }
 
         if (location != null) {
             //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
             telemetryData.addData("Pos", format(location));
+            telemetryData.addData("x", returnX());
+            telemetryData.addData("y", returnY());
+            telemetryData.addData("z", returnZ());
         } else {
             telemetryData.addData("Pos", "Unknown");
         }
     }
 
     public float returnX(){
-        return location.get(0,0);
+        return translation.get(0);
     }
 
     public float returnY(){
-        return location.get(1,0);
+        return translation.get(1);
     }
 
-    public float returnZ(){
-        return location.get(2,0);
-    }
+    public float returnZ(){  return translation.get(2); }
 
     String format(OpenGLMatrix transformationMatrix) {
         return transformationMatrix.formatAsTransform();
