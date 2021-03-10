@@ -21,6 +21,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -91,11 +92,13 @@ public class Drive extends Subsystem{
     private PIDController pidController;
     private PIDController turnPidController;
     private PIDController strafePidController;
+    private PIDController strafeHeadingCorrectionPidController;
     private PIDController correctionPidController;
+    private PIDController strafeCorrectionPIDController;
 
-    public static double P = 0.0003;
+    public static double P = 0.0001;
     public static double I = 0;
-    public static double D = 0.00007;
+    public static double D = 0.000025;
 
     public static double tP = 0.035;
     public static double tI = 0;
@@ -105,9 +108,26 @@ public class Drive extends Subsystem{
     public static double sI = 0;
     public static double sD = 0.00005;
 
-    public static double cP = 0.05; // 0.3
+    public static double cP = 0.1;
     public static double cI = 0;
     public static double cD = 0;
+
+    public static double shcP = 0.1; // 0.5 and 0.1 work on y axis but not as well on strafes, there is to many occilations
+    public static double shcI = 0;
+    public static double shcD = 0;
+
+    public static double scP = 0.00009;
+    public static double scI = 0;
+    public static double scD = 0.00005;
+
+    private double currPosition = 0;
+    private double lastPosition;
+    private double lastPosition2;
+
+    private ElapsedTime time = new ElapsedTime();
+
+    private double currTime = 0;
+    private double lastTime;
 
     private enum AutoMode{
         UNKNOWN,
@@ -132,9 +152,14 @@ public class Drive extends Subsystem{
     public static double XErrorTolerance = 1000;
     public static double headingErrorTolerance = 5;
 
+    private double der = 0;
+    private double der2 = 0;
 
 
-    private AutoMode autoMode = AutoMode.UNKNOWN;
+    private double dy = 0;
+    private double dx = 0;
+
+    public AutoMode autoMode = AutoMode.UNKNOWN;
 
     private LinearOpMode opMode;
 
@@ -154,6 +179,8 @@ public class Drive extends Subsystem{
         turnPidController = new PIDController(tP, tI, tD);
         strafePidController = new PIDController(sP, sI, sD);
         correctionPidController = new PIDController(cP, cI, cD);
+        strafeHeadingCorrectionPidController = new PIDController(shcP, shcI, shcD);
+        strafeCorrectionPIDController = new PIDController(scP, scI, scD);
 
         for (int i=0; i<4;i++){
             motors[i] = robot.getMotor("m" + i);
@@ -174,7 +201,7 @@ public class Drive extends Subsystem{
             for (int i = 0; i < 4; i++){
                 motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
                 motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
-                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             }
 
         } else {
@@ -190,7 +217,7 @@ public class Drive extends Subsystem{
 
             for (int i = 0; i < 4; i++){
                 motors[i].setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
-                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.BRAKE);
             }
 
         }
@@ -212,15 +239,33 @@ public class Drive extends Subsystem{
         telemetryData.addData("y target", omniTicksPerInch((int)target));
 
 
+        //telemetryData.addData("at Y position", atYPosition2());
+//        telemetryData.addData("at X position", atStrafePosition2());
+        //telemetryData.addData("at Turning position", atTurningPosition2());
+
+        telemetryData.addData("der", der);
+        telemetryData.addData("der2", der2);
+        telemetryData.addData("dy", dy);
+        telemetryData.addData("dx", dx);
+
+        telemetryData.addData("currPosition", currPosition);
+        telemetryData.addData("lastPosition", lastPosition);
+
+        telemetryData.addData("currTime", currTime);
+        telemetryData.addData("lastTime", lastTime);
+
+
         telemetryData.addData("target", target);
 
-        telemetryData.addData("m0 power ", motors[0].getPower());
-        telemetryData.addData("m1 power ", motors[1].getPower());
-        telemetryData.addData("m2 power ", motors[2].getPower());
-        telemetryData.addData("m3 power ", motors[3].getPower());
+        telemetryData.addData("m0 power ", motors[0].getVelocity());
+        telemetryData.addData("m1 power ", motors[1].getVelocity());
+        telemetryData.addData("m2 power ", motors[2].getVelocity());
+        telemetryData.addData("m3 power ", motors[3].getVelocity());
 
         telemetryData.addData("corr 0", correction0);
         telemetryData.addData("corr 1", correction1);
+        telemetryData.addData("corr 2", correction2);
+
 
         telemetryData.addData("heading (degrees)", getAngle());
         telemetryData.addData("inTeleOp ", inTeleOp);
@@ -230,10 +275,12 @@ public class Drive extends Subsystem{
         if (!inTeleOp){
 
             // adjust error for a motor power
-            pidController.setOutputBounds(-0.9, 0.9);
+            pidController.setOutputBounds(-1, 1);
             turnPidController.setOutputBounds(-1, 1);
             strafePidController.setOutputBounds(-0.8, 0.8);
-            correctionPidController.setOutputBounds(-0.5, 0.5);
+            strafeHeadingCorrectionPidController.setOutputBounds(-0.8, 0.8);
+            correctionPidController.setOutputBounds(-0.8, 0.8);
+            strafeCorrectionPIDController.setOutputBounds(-0.8, 0.8);
 
 
             switch (autoMode){
@@ -248,7 +295,7 @@ public class Drive extends Subsystem{
                 case Y:
 
                     error0 = target - omniTrackerY.getCurrentPosition();
-                    error1 = getAngle(); // used to correct heading
+                    error1 = getAngle() - turnTarget; // used to correct heading //
 
                     correction0 = pidController.update(error0);
                     correction1 = correctionPidController.update(error1); // used to correct heading
@@ -263,19 +310,25 @@ public class Drive extends Subsystem{
                 case STRAFE:
 
                     error0 = target - omniTrackerX.getCurrentPosition();
-                    error1 = getAngle(); // used to correct heading
+                    error1 = getAngle() - turnTarget; // used to correct heading
+                    error2 = omniTrackerY.getCurrentPosition();
 
                     correction0 = strafePidController.update(error0);
-                    correction1 = correctionPidController.update(error1); // used to correct heading
+                    correction1 = strafeHeadingCorrectionPidController.update(error1); // used to correct heading
+                    correction2 = strafeCorrectionPIDController.update(error2);
 
-                    motors[0].setPower(correction0);
+                    motors[0].setPower(correction0 - correction2);
                     motors[1].setPower(-correction0 - -correction1);
-                    motors[2].setPower(correction0 - correction1);
+                    motors[2].setPower(correction0 - correction2 - correction1);
                     motors[3].setPower(-correction0);
+
+                    //findDerivative(omniTrackerX.getCurrentPosition(), time.milliseconds());
 
                     break;
 
                 case TURN:
+
+                    turnTarget = target;
 
                     error0 = target - getAngle();
 
@@ -343,6 +396,8 @@ public class Drive extends Subsystem{
         target = Ytarget; // motors[0].getCurrentPosition() + Ytarget;
         error0 = YErrorTolerance;
 
+        time.reset();
+
         autoMode = AutoMode.Y;
     }
 
@@ -353,6 +408,8 @@ public class Drive extends Subsystem{
 
         target = Ytarget; //motors[0].getCurrentPosition() + Ytarget;
         error0 = YErrorTolerance;
+
+        time.reset();
 
         autoMode = AutoMode.Y;
     }
@@ -367,6 +424,8 @@ public class Drive extends Subsystem{
         target = Xtarget; // motors[0].getCurrentPosition() + Xtarget;
         error0 = XErrorTolerance;
 
+        time.reset();
+
         autoMode = AutoMode.STRAFE;
     }
 
@@ -380,24 +439,86 @@ public class Drive extends Subsystem{
         target = Xtarget; // motors[0].getCurrentPosition() + Xtarget;
         error0 = XErrorTolerance;
 
+        time.reset();
+
         autoMode = AutoMode.STRAFE;
     }
 
 
-    public boolean atYPosition(){
+    public boolean atYPosition(){ // warning do not loop over this method in more than one place at a time
 
-        if (Math.abs(error0) < YErrorTolerance) {
-            error0 = YErrorTolerance;
+        // detect oscillation
+
+        // if no oscillation then probably fell to steady state error so detect a derivative of 0
+        double currPosition = omniTrackerY.getCurrentPosition();
+        double currTime = time.milliseconds();
+
+        dy = (currPosition - lastPosition);
+        dx = (currTime - lastTime);
+
+        der = dy / dx;
+
+        lastPosition = currPosition;
+        lastTime = currTime;
+
+        if (atYTolerance() && der < 3 && der > -3){
+            lastPosition = 0;
+            lastTime = 0;
             return true;
-        } else {
+        }
+        else{
             return false;
-            }
+        }
+    }
+
+    public boolean atYTolerance(){
+        return  (Math.abs(error0) < YErrorTolerance);
     }
 
 
-    public boolean atStrafePosition(){
-        if (Math.abs(error0) < XErrorTolerance){
-            error0 = XErrorTolerance;
+    public boolean atStrafePosition(){ // warning do not loop over this method in more than one place at a time
+        // detect oscillation
+
+        // if no oscillation then probably fell to steady state error so detect a derivative of 0
+
+        double currPosition = omniTrackerX.getCurrentPosition();
+        double currTime = time.milliseconds();
+
+        dy = (currPosition - lastPosition);
+        dx = (currTime - lastTime);
+
+        boolean headingCorrect = atStrafeCorrectionHeading(dx);
+
+        der = dy / dx;
+
+        lastPosition = currPosition;
+        lastTime = currTime;
+
+        if (atXTolerance() && headingCorrect && der < 1 && der > -1){
+            lastPosition = 0;
+            lastTime = 0;
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    public boolean atXTolerance(){
+        return (Math.abs(error0) < XErrorTolerance);
+    }
+
+    private boolean atStrafeCorrectionHeading(double dx){
+        double currPosition = getAngle();
+
+        double dy = (currPosition - lastPosition2);
+
+        der2 = dy / dx;
+
+        lastPosition2 = currPosition;
+
+        if (Math.abs(currPosition) < 2 && der2 < 0.02 && der2 > -0.02){
+            lastPosition2 = 0;
             return true;
         }
         else{
@@ -444,12 +565,32 @@ public class Drive extends Subsystem{
 
 
     public boolean atTurningPosition() {
-        if (Math.abs(error0) < headingErrorTolerance) {
-            error0 = headingErrorTolerance;
+        // detect oscillation
+
+        // if no oscillation then probably fell to steady state error so detect a derivative of 0
+        double currPosition = getAngle();
+        double currTime = time.milliseconds();
+
+        dy = (currPosition - lastPosition);
+        dx = (currTime - lastTime);
+
+        der = dy / dx;
+
+        lastPosition = currPosition;
+        lastTime = currTime;
+
+        if (atTurningTolerance() && der < 3 && der > -3){ // atTurningTolerance
+            lastPosition = 0;
+            lastTime = 0;
             return true;
-        } else {
+        }
+        else{
             return false;
         }
+    }
+
+    public boolean atTurningTolerance(){
+        return (Math.abs(error0) < headingErrorTolerance);
     }
 
     public void resetAngle(){
@@ -500,7 +641,85 @@ public class Drive extends Subsystem{
     }
 
 
+    // drive aiming trajectory
+
+    public void autoShoot(){
+        // switch to isTeleOp = false
+        switchWheelDirections(false);
+
+        // determine trajectory to make a shot
+
+        //test
+        moveForward(48);
+        //test
+
+        // move drive  and shoot rings
+
+        // when shot, switch to isTeleOp = true
+
+        // checked when trajectory finished then restore teleOp motor directions
+    }
+
+    public boolean finishedTrajectory(Telemetry telemetry){
+        if (atYPosition()) {
+            switchWheelDirections(true);
+
+            telemetry.addLine("ready for driving");
+
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    private void switchWheelDirections(boolean inTeleOp){
+        this.inTeleOp = inTeleOp;
+        if (inTeleOp){
+            motors[0].setDirection(DcMotorEx.Direction.FORWARD);
+            motors[1].setDirection(DcMotorEx.Direction.REVERSE);
+            motors[2].setDirection(DcMotorEx.Direction.FORWARD);
+            motors[3].setDirection(DcMotorEx.Direction.REVERSE);
+
+            for (int i = 0; i < 4; i++){
+                motors[i].setMode(DcMotorEx.RunMode.RUN_USING_ENCODER);
+                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            }
+        }
+
+        else{
+            omniTrackerX.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            omniTrackerY.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            motors[0].setDirection(DcMotorEx.Direction.REVERSE);
+            motors[1].setDirection(DcMotorEx.Direction.REVERSE);
+            motors[2].setDirection(DcMotorEx.Direction.FORWARD);
+            motors[3].setDirection(DcMotorEx.Direction.FORWARD);
+
+            for (int i = 0; i < 4; i++){
+                motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);
+                motors[i].setZeroPowerBehavior(DcMotorEx.ZeroPowerBehavior.FLOAT);
+            }
+        }
+    }
+
     // misc
+
+
+    private void findDerivative(double currPosition, double currTime){
+        this.currPosition = currPosition;
+        this.currTime = currTime;
+
+        dy = (currPosition - lastPosition);
+        dx = (currTime - lastTime);
+
+        // if no oscillation then probably fell to steady state error so detect a derivative of 0
+        der = dy / dx;
+
+        lastPosition = currPosition;
+        lastTime = currTime;
+    }
 
     private double omniTicksPerInch(int ticks){
         double circumference = 2 * Math.PI * TRACKER_RADIUS;
@@ -563,4 +782,23 @@ public class Drive extends Subsystem{
         }
     }
 
+    private void stopOscillation(){
+        int passes = 0; // will need to be a var outside this scope because is will get looped over
+        boolean over = false;
+
+        // if over shot and under shot, is oscillating
+        if (!over && currPosition > target){
+            passes += 1;
+            over = true;
+        }
+
+        if (over && currPosition < target){
+            passes += 1;
+            over = false;
+        }
+
+        // exponentially decay the effort of the pid to get a flattened curve
+
+
+    }
 }

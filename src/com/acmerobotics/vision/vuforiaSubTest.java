@@ -1,14 +1,12 @@
 package com.acmerobotics.vision;
 
 import com.acmerobotics.dashboard.canvas.Canvas;
-import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.robomatic.robot.Robot;
-import com.acmerobotics.robomatic.robot.Subsystem;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.RobotLog;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -22,8 +20,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 import java.util.ArrayList;
 import java.util.List;
 
-@Config
-public class vuforiaSubsystem extends Subsystem {
+public class vuforiaSubTest {
 
     float mmPerInch        = 25.4f;
     float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
@@ -50,8 +47,7 @@ public class vuforiaSubsystem extends Subsystem {
 
     private LinearOpMode opMode;
 
-    public vuforiaSubsystem(Robot robot, LinearOpMode opMode){
-        super("vuforiaSubsystem");
+    public vuforiaSubTest(LinearOpMode opMode){
 
         this.opMode = opMode;
 
@@ -60,7 +56,8 @@ public class vuforiaSubsystem extends Subsystem {
         //Setting Vuforia parameters
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
         parameters.vuforiaLicenseKey = "AdzxQPD/////AAABmWQr+AytbUpprVx2VNTgNiJgawbK313otTyXa3Th2KAhi06wLMwml/nAjh58jdIbDitq5cji21735oTIvYjaoFNdeEZzhQW6aieofpzebPDxtAUTXKVDws1MCES3iCBk2z0z8YhwaRfREOj6VdiqY1zPyhc5vBrnc8ioV2B1Jyuz56SGeHq9tmQ5KiYwUPfGSKZ1+p3vWqymEmwOcN7Ym/oOf6ZVLJgrd+NEJM2TNg1xwepmiexQVVwiBWpUDx9/Q6DpQIPpapiyoCDzXZoOMBUxxqw3HhHI1ZWA//utIdWRElWbZ2+Y4umURnZg54HT4PVe6nMzR8t56YXZUB851ly0D6G3WQoySEOkVg46CrL7";
-        parameters.cameraName = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
+        //parameters.cameraName = opMode.hardwareMap.get(WebcamName.class, "Webcam 1");
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
 
@@ -111,8 +108,7 @@ public class vuforiaSubsystem extends Subsystem {
     }
 
 
-    @Override
-    public void update(Canvas fieldOverlay) {
+    public void update(Telemetry telemetryData) {
 
         List<VuforiaTrackable> allTrackables = new ArrayList<VuforiaTrackable>();
         allTrackables.addAll(ultimateGoal);
@@ -139,6 +135,7 @@ public class vuforiaSubsystem extends Subsystem {
         } else {
             telemetryData.addData("Pos", "Unknown");
         }
+        telemetryData.update();
     }
 
     public float returnX(){
@@ -153,12 +150,9 @@ public class vuforiaSubsystem extends Subsystem {
         return location.getTranslation().get(2);
     }
 
-    public String returnPos(){
-        return format(location);
-    }
-
     String format(OpenGLMatrix transformationMatrix) {
         return transformationMatrix.formatAsTransform();
 
     }
+
 }

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 @Config
 public class Launcher extends Subsystem {
 
-    public static double power = 0.975; // 0.975 for high, 0.825 for mid, x for low
+    public static double power = 0.825; // 0.975 for high, 0.825 for mid, x for low
 
     private boolean shooting = false;
 
@@ -24,7 +24,8 @@ public class Launcher extends Subsystem {
     public Servo aimServo; //the higher position the lower the aim will be
     public Servo launcherServo;
 
-    public static double servoAim = 0.7; // higher for lower shot position
+    public static double servoAim = 0.71; // higher for lower shot position
+    public static double servoAimCloseUp = 0.66;
 
     public static double kickPosition = 1;
     public static double resetPosition = 0.75;
@@ -122,8 +123,8 @@ public class Launcher extends Subsystem {
 
     public void shootHigh(){
         shooting = true;
-        aimServo.setPosition(servoAim);
-        power = 0.975;
+        aimServo.setPosition(servoAimCloseUp);
+        power = 0.825;
 
         launcherShooterMotorFront.setPower(power);
         launcherShooterMotorBack.setPower(power);
