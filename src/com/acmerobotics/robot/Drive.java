@@ -673,7 +673,7 @@ public class Drive extends Subsystem{
         }
     }
 
-    private void switchWheelDirections(boolean inTeleOp){
+    public void switchWheelDirections(boolean inTeleOp){
         this.inTeleOp = inTeleOp;
         if (inTeleOp){
             motors[0].setDirection(DcMotorEx.Direction.FORWARD);

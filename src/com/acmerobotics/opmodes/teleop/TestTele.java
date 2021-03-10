@@ -6,7 +6,6 @@ import com.acmerobotics.roadrunner.geometry.Pose2d;
 import com.acmerobotics.robomatic.util.StickyGamepad;
 import com.acmerobotics.robot.ACMERobot;
 import com.acmerobotics.robot.Drive;
-import com.acmerobotics.vision.vuforiaSubTest;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -36,6 +35,13 @@ public class TestTele extends LinearOpMode {
 //        Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
         waitForStart();
+
+        robot.drive.switchWheelDirections(false);
+
+        robot.drive.moveForward(24);
+        robot.runUntil(robot.drive::atYPosition);
+
+        robot.drive.switchWheelDirections(true);
 
         while (!isStopRequested()) {
 
