@@ -31,7 +31,7 @@ public class Launcher extends Subsystem {
     public static double resetPosition = 0.75;
 
     private static double TICKS_PER_REV = 25;
-    private static double MAX_RPM = 6000;
+    private static double RPM = 5000;
 
     RPMTool rpmTool;
 
@@ -131,6 +131,6 @@ public class Launcher extends Subsystem {
     }
 
     public boolean isMaxVelocity() {
-        return (rpmTool.getRPM() >= (MAX_RPM - 500));
+        return (rpmTool.getRPM() >= (RPM - 400)); // not max rpm but a good rmp to shoot at (max is 6000)
     }
 }

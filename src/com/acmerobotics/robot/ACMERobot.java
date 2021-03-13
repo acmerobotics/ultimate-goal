@@ -45,9 +45,9 @@ public class ACMERobot extends Robot {
 
     public void shootRingA(){
         launcher.kickRing();
-        runForTime(1000);
+        runForTime(500);
         launcher.resetKicker();
-        runForTime(1000);
+        runForTime(500);
 
     }
 

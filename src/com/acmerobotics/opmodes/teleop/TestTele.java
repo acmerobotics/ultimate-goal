@@ -13,6 +13,7 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.acmerobotics.vision.vuforiaSubsystem;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @Config
 @TeleOp(name = "testTeleOp")
@@ -23,6 +24,18 @@ public class TestTele extends LinearOpMode {
 
     public static double leftPowerMod = 0.05;
     public static double rightPowerMod = 0.05;
+
+    boolean inAutomatic = false;
+
+    boolean shooting = false;
+
+    boolean ready = true;
+
+    double distanceFromLine = 0;
+
+    double getDistanceFromSpot = 0;
+
+    double farPosition = 0; // farPos is the distance needed before switching servo position to further one
 
 
     @Override
@@ -36,45 +49,67 @@ public class TestTele extends LinearOpMode {
 
         waitForStart();
 
-        robot.drive.switchWheelDirections(false);
-
-        robot.drive.moveForward(24);
-        robot.runUntil(robot.drive::atYPosition);
-
-        robot.drive.switchWheelDirections(true);
-
         while (!isStopRequested()) {
 
-            Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-            robot.drive.setPower(v);
+            if (!inAutomatic) {
+                Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+                robot.drive.setPower(v);
+            }
 
             if (stickyGamepad.a){
-                //robot.launcher.launcherServo.setPosition(aimPosition);
-                robot.drive.autoShoot();
+                inAutomatic = true;
+
+                robot.drive.autoTrajectory(-24);
+
+                // determine shooting angle
+
+                ready = false;
+
             }
 
-            robot.drive.finishedTrajectory(telemetry);
+            if (inAutomatic && robot.drive.atStrafePositionAutomatic() && !shooting){
+                robot.drive.stopVel();
 
-            if (stickyGamepad.x){
-                //robot.launcher.aimServo.setPosition(0.6);
-                robot.drive.stopMotors();
+                shooting = true;
             }
 
-//            robot.drive.moveForward(84);
-//
-//            robot.runUntil(robot.drive::atYPosition);
-//
-//            robot.drive.moveBack(84);
-//
-//            robot.runUntil(robot.drive::atYPosition);
-//
-//            // press a to start launcher motor, press a again to stop
-//            if (stickyGamepad.x){
-//                robot.launcher.shoot();
-//            }
+            if (shooting){
+
+                if (distanceFromLine > farPosition){
+                    // set position to shoot far
+                    //robot.launcher.shootMid();
+                }
+                else{
+                    // set position to shoot close up
+                    // robot.launcher.shootHigh();
+                }
+
+                robot.launcher.shootMid();
+
+                robot.runUntil(robot.launcher::isMaxVelocity);
+
+                robot.shootRingA();
+                robot.shootRingA();
+                robot.shootRingA();
+
+                robot.launcher.shoot();
+
+                shooting = false;
+
+                robot.drive.switchWheelDirections(true);
+
+                ready = true;
+
+                inAutomatic = false;
+            }
+
+            if (gamepad1.x){
+                robot.drive.stopVel();
+            }
+
+            telemetry.addData("target visible: ", false);
 
             telemetry.update();
-
             stickyGamepad.update();
             robot.update();
 

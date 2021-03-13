@@ -23,7 +23,9 @@ public class testAuto extends LinearOpMode {
 
         waitForStart();
 
-//        while (!isStopRequested()) {
+
+       // while (!isStopRequested()) {
+
 //
 //
 //            if (stickyGamepad.a){
@@ -51,20 +53,28 @@ public class testAuto extends LinearOpMode {
         robot.runUntil(robot.drive::atYPosition);
 
         robot.drive.strafeLeft(24);
-        robot.runUntil(robot.drive::atStrafePosition);
 
-//        robot.drive.turnRight(30);
-//        robot.runUntil(robot.drive::atTurningPosition2);
+//        robot.drive.automaticY(48);
+//        robot.runUntil(robot.drive::atYPosition);
 
-        robot.drive.stopMotors();
+//        robot.drive.automaticStrafe(24);
+//        robot.runUntil(robot.drive::atStrafePosition);
+
+//        robot.drive.automaticY(-48);
+//        robot.runUntil(robot.drive::atYPosition);
 //
+//        robot.drive.automaticStrafe(-24);
+//        robot.runUntil(robot.drive::atStrafePosition);
+
+        //robot.drive.stopVel();
+
 //            // press a to start launcher motor, press a again to stoppastFirstCycle = true; // prevent the system from detecting a reached position before the movement started
 //            if (stickyGamepad.x){
 //                robot.launcher.shoot();
 //            }
 
 
-            stickyGamepad.update();
+            //stickyGamepad.update();
             //robot.update();
         robot.runUntilStop();
 
