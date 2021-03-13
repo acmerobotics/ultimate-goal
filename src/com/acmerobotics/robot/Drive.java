@@ -129,7 +129,7 @@ public class Drive extends Subsystem{
     public static double sI = 0;
     public static double sD = 0; // 0.00005
 
-    public static double cP = 0.04;
+    public static double cP = 0.07;
     public static double cI = 0;
     public static double cD = 0;
 
@@ -648,7 +648,7 @@ public class Drive extends Subsystem{
 
         lastPosition2 = currPosition;
 
-        if (Math.abs(currPosition) < 2 && der2 < 0.02 && der2 > -0.02){
+        if (Math.abs(currPosition) < 3 && der2 < 0.02 && der2 > -0.02){
             lastPosition2 = 0;
             return true;
         }
