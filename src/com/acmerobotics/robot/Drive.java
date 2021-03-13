@@ -209,6 +209,7 @@ public class Drive extends Subsystem{
         telemetryData.addData("Y Position", omniTrackerY.getCurrentPosition());
         telemetryData.addData("X position inches", strafeCurrentPositionInches());
         telemetryData.addData("Y position inches", omniTicksPerInch(omniTrackerY.getCurrentPosition()));
+        telemetryData.addData("y target", omniTicksPerInch((int)target));
 
 
         telemetryData.addData("target", target);

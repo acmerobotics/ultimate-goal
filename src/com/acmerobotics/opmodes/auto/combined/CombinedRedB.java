@@ -3,14 +3,14 @@ package com.acmerobotics.opmodes.auto.combined;
 import com.acmerobotics.opmodes.auto.Auto;
 import com.acmerobotics.robot.ACMERobot;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
+@Disabled
 @Autonomous(group = "Combined")
 public class CombinedRedB extends Auto {
 
     @Override
     public void run() throws InterruptedException {
-
-        targetZone = TargetZone.C;
 
         ACMERobot robot = new ACMERobot(this);
 
@@ -24,7 +24,10 @@ public class CombinedRedB extends Auto {
 
         // DETECT_RINGS
         robot.drive.stopMotors();
+        robot.ringDetector.startDetecting();
         robot.runForTime(3000);
+        robot.ringDetector.stopDetecting();
+        robot.runForTime(500);
 
         // TURN_BACK
         robot.drive.turnLeft(90);
@@ -33,6 +36,20 @@ public class CombinedRedB extends Auto {
         // MOVE_TO_LINE
         robot.drive.moveForward(34);
         robot.runUntil(robot.drive::atYPosition);
+
+
+        // DETERMINE_TARGET_ZONE
+        if (robot.ringDetector.detectedRings() == 0){
+            targetZone = TargetZone.A;
+        }
+
+        else if (robot.ringDetector.detectedRings() == 1){
+            targetZone = TargetZone.B;
+        }
+
+        else{
+            targetZone = TargetZone.C;
+        }
 
 
         // MOVE_TO_SQUARE

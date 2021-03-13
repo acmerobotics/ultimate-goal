@@ -12,6 +12,9 @@ public class ShootBlueA extends Auto {
 
         ACMERobot robot = new ACMERobot(this);
 
+        robot.intake.moveServo();
+        robot.update();
+
         robot.drive.moveForward(80 - (robot.len + robot.errorMargin));
         robot.runUntil(robot.drive::atYPosition);
 
@@ -28,9 +31,15 @@ public class ShootBlueA extends Auto {
         robot.update();
 
         // shoot rings
-        Thread.sleep(3000);
+        robot.launcher.shootHigh();
+        robot.runUntil(robot.launcher::isMaxVelocity);
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.launcher.shoot();
+        robot.update();
 
-        robot.drive.moveForward((robot.len /2) + 1);
+        robot.drive.moveForward((robot.len /2) + 2);
         robot.runUntil(robot.drive::atYPosition);
 
         robot.drive.stopMotors();
