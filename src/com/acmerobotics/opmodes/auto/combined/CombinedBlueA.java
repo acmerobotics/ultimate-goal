@@ -111,7 +111,7 @@ public class CombinedBlueA extends Auto {
             // drop wobble
             robot.dropWobble();
 
-            robot.drive.turnRight(25);
+            robot.drive.turnRight(40);
             robot.runUntil(robot.drive::atTurningPosition);
         }
 
@@ -151,21 +151,21 @@ public class CombinedBlueA extends Auto {
 
 
         // ADJUST_AIM
-//        robot.drive.turnTo(0);
-//        robot.runForTime(1000);
-//
-//        // SHOOT_RINGS
-//        robot.launcher.shootHigh();
-//        robot.runUntil(robot.launcher::isMaxVelocity);
-//        robot.shootRingA();
-//        robot.shootRingA();
-//        robot.shootRingA();
-//        robot.launcher.shoot();
-//        robot.update();
-//
-//        // PARK
-//        robot.drive.moveForward((robot.len / 2) + 4);
-//        robot.runUntil(robot.drive::atYPosition);
+        robot.drive.turnTo(0);
+        robot.runForTime(1000);
+
+        // SHOOT_RINGS
+        robot.launcher.shootHigh();
+        robot.runUntil(robot.launcher::isMaxVelocity);
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.shootRingA();
+        robot.launcher.shoot();
+        robot.update();
+
+        // PARK
+        robot.drive.moveForward((robot.len / 2) + 4);
+        robot.runUntil(robot.drive::atYPosition);
 
 //        robot.drive.stopMotors();
         robot.runUntilStop();

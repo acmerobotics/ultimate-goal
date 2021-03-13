@@ -837,19 +837,6 @@ public class Drive extends Subsystem{
         automaticStrafe(distanceFromShootingSpot);
     }
 
-    public boolean finishedTrajectory(Telemetry telemetry){
-        if (atYPosition()) {
-            switchWheelDirections(true);
-
-            telemetry.addLine("ready for driving");
-
-            return true;
-        }
-        else{
-            telemetry.clearAll();
-            return false;
-        }
-    }
 
     public void switchWheelDirections(boolean inTeleOp){
         this.inTeleOp = inTeleOp;
