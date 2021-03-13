@@ -5,6 +5,7 @@ import android.util.Log;
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.util.RPMTool;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -20,6 +21,7 @@ when freeFlywheelSpeed drops more than this threshold, the program will detect a
 This will be used to test the time it takes from shooting to ready to shoot again.
  */
 
+@Disabled
 @com.qualcomm.robotcore.eventloop.opmode.TeleOp(name = "Launcher Prototype")
 
 @Config
