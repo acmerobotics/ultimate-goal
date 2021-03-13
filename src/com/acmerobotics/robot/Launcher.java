@@ -130,6 +130,6 @@ public class Launcher extends Subsystem {
     }
 
     public boolean isMaxVelocity() {
-        return (rpmTool.getRPM() >= (MAX_RPM - 500));
+        return (rpmTool.getRPM() >= (MAX_RPM - 1000)); //was 500 originally, trying to increase margin of error
     }
 }

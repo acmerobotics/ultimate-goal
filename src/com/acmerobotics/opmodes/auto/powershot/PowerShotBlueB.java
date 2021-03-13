@@ -6,13 +6,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(group = "power shot")
 public class PowerShotBlueB extends Auto {
+    ACMERobot robot = new ACMERobot(this);
 
     @Override
     public void run() throws InterruptedException {
-        ACMERobot robot = new ACMERobot(this);
 
-        robot.intake.moveServo();
-        robot.update();
+        //robot.intake.moveServo();
+       // robot.update();
 
         //move into positon
         robot.drive.moveForward(80 - (robot.len + robot.errorMargin));
@@ -21,7 +21,7 @@ public class PowerShotBlueB extends Auto {
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(15); //haha this probably isn't right
+        robot.drive.strafeRight(35); //haha this probably isn't right
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.moveBack(4);
@@ -31,7 +31,7 @@ public class PowerShotBlueB extends Auto {
         robot.update();
 
         //shoot first ring
-        robot.launcher.shootHigh();
+        robot.launcher.shootMid();
         robot.runUntil(robot.launcher::isMaxVelocity);
         robot.shootRingA();
 
@@ -39,7 +39,7 @@ public class PowerShotBlueB extends Auto {
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(7.5);
+        robot.drive.strafeRight(10);
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.moveBack(4);
@@ -49,7 +49,7 @@ public class PowerShotBlueB extends Auto {
         robot.update();
 
         //shoot second ring
-        robot.launcher.shootHigh();
+        robot.launcher.shootMid();
         robot.runUntil(robot.launcher::isMaxVelocity);
         robot.shootRingA();
 
@@ -57,7 +57,7 @@ public class PowerShotBlueB extends Auto {
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(7.5);
+        robot.drive.strafeRight(10);
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.moveBack(4);
@@ -67,12 +67,12 @@ public class PowerShotBlueB extends Auto {
         robot.update();
 
         //shoot final ring
-        robot.launcher.shootHigh();
+        robot.launcher.shootMid();
         robot.runUntil(robot.launcher::isMaxVelocity);
         robot.shootRingA();
 
         //park
-        robot.drive.moveForward((robot.len /2) + 2);
+        robot.drive.moveForward(2);
         robot.runUntil(robot.drive::atYPosition);
 
         robot.drive.stopMotors();

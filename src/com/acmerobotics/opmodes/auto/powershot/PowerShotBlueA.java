@@ -11,17 +11,17 @@ public class PowerShotBlueA extends Auto {
     public void run() throws InterruptedException {
         ACMERobot robot = new ACMERobot(this);
 
-        robot.intake.moveServo();
-        robot.update();
+        //robot.intake.moveServo();
+        //robot.update();
 
         //move into positon
-        robot.drive.moveForward(80 - (robot.len + robot.errorMargin));
+        robot.drive.moveForward(70 - (robot.len + robot.errorMargin));
         robot.runUntil(robot.drive::atYPosition);
 
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(16); //haha this probably isn't right
+        robot.drive.strafeRight(23); //haha this probably isn't right
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.moveBack(4);
@@ -31,7 +31,7 @@ public class PowerShotBlueA extends Auto {
         robot.update();
 
         //shoot first ring
-        robot.launcher.shootHigh();
+        robot.launcher.shootMid();
         robot.runUntil(robot.launcher::isMaxVelocity);
         robot.shootRingA();
 
@@ -39,7 +39,7 @@ public class PowerShotBlueA extends Auto {
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(7.5);
+        robot.drive.strafeRight(10);
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.moveBack(4);
@@ -49,15 +49,15 @@ public class PowerShotBlueA extends Auto {
         robot.update();
 
         //shoot second ring
-        robot.launcher.shootHigh();
-        robot.runUntil(robot.launcher::isMaxVelocity);
+        robot.launcher.shootMid();
+       // robot.runUntil(robot.launcher::isMaxVelocity);
         robot.shootRingA();
 
         //move to final power shot
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(7.5);
+        robot.drive.strafeRight(10);
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.moveBack(4);
@@ -67,8 +67,8 @@ public class PowerShotBlueA extends Auto {
         robot.update();
 
         //shoot final ring
-        robot.launcher.shootHigh();
-        robot.runUntil(robot.launcher::isMaxVelocity);
+        robot.launcher.shootMid();
+        //robot.runUntil(robot.launcher::isMaxVelocity);
         robot.shootRingA();
 
         //park
