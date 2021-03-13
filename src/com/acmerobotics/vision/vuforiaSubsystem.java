@@ -27,11 +27,14 @@ import java.util.List;
 public class vuforiaSubsystem extends Subsystem {
 
     float mmPerInch        = 25.4f;
-    float mmBotWidth       = 18 * mmPerInch;            // ... or whatever is right for your robot
     float mmFTCFieldWidth  = (12*12 - 2) * mmPerInch;   // the FTC field is ~11'10" center-to-center of the glass panels
 
     OpenGLMatrix location;
     VuforiaLocalizer vuforia;
+
+    Orientation rotation;
+
+    boolean isBlueGoalVisible1;
 
     WebcamName webcam;
     int cameraMonitorViewId;
@@ -40,17 +43,22 @@ public class vuforiaSubsystem extends Subsystem {
 
     VuforiaTrackable BlueTowerGoal;
 
-    VuforiaTrackable RedTowerGoal;
+    //VuforiaTrackable RedTowerGoal;
 
     OpenGLMatrix blueGoalLocation;
 
-    OpenGLMatrix redGoalLocation;
+    //OpenGLMatrix redGoalLocation;
 
     OpenGLMatrix cameraLocationOnRobot;
 
     public VuforiaTrackables ultimateGoal;
 
     VectorF translation;
+
+    //for setting webcam position. negative means opposite of the direction in variable name
+    final float webcamForwardDistance = 8.25f * mmPerInch;
+    final float webcamUpwardDistance = 6f * mmPerInch;
+    final float webcamLeftDistance = -7.625f * mmPerInch;
 
     private LinearOpMode opMode;
 
@@ -74,47 +82,42 @@ public class vuforiaSubsystem extends Subsystem {
         BlueTowerGoal = ultimateGoal.get(0/*put the number of the image here*/);
         BlueTowerGoal.setName("BlueTowerGoal");
 
-        RedTowerGoal = ultimateGoal.get(1/*put the number of the image here*/);
-        RedTowerGoal.setName("RedTowerGoal");
-
-
+        //RedTowerGoal = ultimateGoal.get(1/*put the number of the image here*/);
+        //RedTowerGoal.setName("RedTowerGoal");
 
 
         //Use to set the location of a vumark
         blueGoalLocation = OpenGLMatrix
                 //Location
-                .translation(-mmFTCFieldWidth/2, 0, 0)
+                .translation(mmFTCFieldWidth/2, mmFTCFieldWidth/4, 6*mmPerInch)
                 .multiplied(Orientation.getRotationMatrix(
                         //Rotation
-                        AxesReference.EXTRINSIC, AxesOrder.XZX, AngleUnit.DEGREES, 90, 90, 0));
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES, 90, 0, -90));
         BlueTowerGoal.setLocation(blueGoalLocation);
         RobotLog.ii("Vuforia Test", "Blue Goal=%s", format(blueGoalLocation));
 
-        redGoalLocation = OpenGLMatrix
+        //redGoalLocation = OpenGLMatrix
                 //Location
-                .translation(-mmFTCFieldWidth/2, 0, 0)
-                .multiplied(Orientation.getRotationMatrix(
+               // .translation(-mmFTCFieldWidth/2, 0, 0)
+               // .multiplied(Orientation.getRotationMatrix(
                         //Rotation
-                        AxesReference.EXTRINSIC, AxesOrder.XZX,AngleUnit.DEGREES, 90, 90, 0));
-        RedTowerGoal.setLocation(redGoalLocation);
-        RobotLog.ii(RobotLog.TAG, "Red Goal=%s", format(redGoalLocation));
+               //         AxesReference.EXTRINSIC, AxesOrder.XZX,AngleUnit.DEGREES, 90, 90, 0));
+        //RedTowerGoal.setLocation(redGoalLocation);
+        //RobotLog.ii(RobotLog.TAG, "Red Goal=%s", format(redGoalLocation));
 
         //Use to set the location of the phone
+
         cameraLocationOnRobot = OpenGLMatrix
-                .translation(mmBotWidth/2,0,0)
+                .translation(webcamForwardDistance,webcamLeftDistance,webcamUpwardDistance)
                 .multiplied(Orientation.getRotationMatrix(
-                        AxesReference.EXTRINSIC, AxesOrder.YZY,
-                        AngleUnit.DEGREES, -90, 0, 0));
+                        AxesReference.EXTRINSIC, AxesOrder.YZX,
+                        AngleUnit.DEGREES, 0, 0, 0));
         RobotLog.ii("Vuforia Test", "camera=%s", format(cameraLocationOnRobot));
 
-
-
-
         ((VuforiaTrackableDefaultListener)BlueTowerGoal.getListener()).setPhoneInformation(cameraLocationOnRobot, parameters.cameraDirection);
-        ((VuforiaTrackableDefaultListener)RedTowerGoal.getListener()).setPhoneInformation(cameraLocationOnRobot, parameters.cameraDirection);
+        //((VuforiaTrackableDefaultListener)RedTowerGoal.getListener()).setPhoneInformation(cameraLocationOnRobot, parameters.cameraDirection);
 
     }
-
 
     @Override
     public void update(Canvas fieldOverlay) {
@@ -131,35 +134,60 @@ public class vuforiaSubsystem extends Subsystem {
             if (robotLocationTransform != null) {
                 location = robotLocationTransform;
                 translation = location.getTranslation();
+                rotation = Orientation.getOrientation(robotLocationTransform, AxesReference.EXTRINSIC, AxesOrder.XYZ, AngleUnit.DEGREES);
+
             }
 
+        }
 
+        VuforiaTrackable blue;
+        blue = allTrackables.get(0);
+        if (((VuforiaTrackableDefaultListener) blue.getListener()).isVisible()) {
+
+            isBlueGoalVisible1 = true;
+
+        } else {
+
+            isBlueGoalVisible1 = false;
 
         }
 
         if (location != null) {
             //  RobotLog.vv(TAG, "robot=%s", format(lastLocation));
             telemetryData.addData("Pos", format(location));
-            telemetryData.addData("x", returnX());
-            telemetryData.addData("y", returnY());
-            telemetryData.addData("z", returnZ());
+            telemetryData.addData("x", returnVuforiaX());
+            telemetryData.addData("y", returnVuforiaY());
+            telemetryData.addData("isBlueGoalVisible", isBlueGoalVisible1);
         } else {
             telemetryData.addData("Pos", "Unknown");
         }
     }
 
-    public float returnX(){
-        return translation.get(0);
-    }
-
-    public float returnY(){
-        return translation.get(1);
-    }
-
-    public float returnZ(){  return translation.get(2); }
 
     String format(OpenGLMatrix transformationMatrix) {
         return transformationMatrix.formatAsTransform();
-
     }
+
+    //The subtracted and added values are to account for webcam position
+    public float returnVuforiaX(){return (translation.get(0) / mmPerInch) - 8.25f;}
+
+    public float returnVuforiaY(){return (translation.get(1) / mmPerInch) + 7.625f;}
+
+
+    //Completely untested
+    public float returnDriveX(float endXCoordinate){return endXCoordinate - returnVuforiaX();}
+    public float returnDriveY(float endYCoordinate){return endYCoordinate - returnVuforiaY();}
+
+    public boolean isBlueGoalVisible(){return isBlueGoalVisible1;}
+
+    //public float returnVuforiaZ(){return translation.get(2) / mmPerInch;}
+
+    //public double returnVuforiaXRotation(){return rotation.firstAngle;}
+
+    //public double returnVuforiaYRotation(){return rotation.secondAngle;}
+
+    //public double returnVuforiaZRotation(){return rotation.thirdAngle;} //Heading
+
+    //public VectorF returnVuforiaVectorF(){ return translation;}
+
 }

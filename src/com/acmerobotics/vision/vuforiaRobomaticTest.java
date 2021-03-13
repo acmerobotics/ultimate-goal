@@ -28,10 +28,6 @@ public class vuforiaRobomaticTest extends LinearOpMode {
 
             robot.update();
 
-            if (robot.vuforiaSubsystem.location != null) {
-                telemetry.addData("x", robot.vuforiaSubsystem.returnX());
-            }
-
             telemetry.update();
             telemetry.clear();
 
