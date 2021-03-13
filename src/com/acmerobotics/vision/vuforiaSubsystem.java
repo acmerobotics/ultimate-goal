@@ -34,7 +34,7 @@ public class vuforiaSubsystem extends Subsystem {
 
     Orientation rotation;
 
-    boolean isBlueGoalVisible1;
+    boolean isBlueGoalVisibleLocal;
 
     WebcamName webcam;
     int cameraMonitorViewId;
@@ -84,7 +84,6 @@ public class vuforiaSubsystem extends Subsystem {
 
         //RedTowerGoal = ultimateGoal.get(1/*put the number of the image here*/);
         //RedTowerGoal.setName("RedTowerGoal");
-
 
         //Use to set the location of a vumark
         blueGoalLocation = OpenGLMatrix
@@ -144,11 +143,11 @@ public class vuforiaSubsystem extends Subsystem {
         blue = allTrackables.get(0);
         if (((VuforiaTrackableDefaultListener) blue.getListener()).isVisible()) {
 
-            isBlueGoalVisible1 = true;
+            isBlueGoalVisibleLocal = true;
 
         } else {
 
-            isBlueGoalVisible1 = false;
+            isBlueGoalVisibleLocal = false;
 
         }
 
@@ -157,35 +156,36 @@ public class vuforiaSubsystem extends Subsystem {
             telemetryData.addData("Pos", format(location));
             telemetryData.addData("x", returnVuforiaX());
             telemetryData.addData("y", returnVuforiaY());
-            telemetryData.addData("isBlueGoalVisible", isBlueGoalVisible1);
+            telemetryData.addData("isBlueGoalVisible", isBlueGoalVisible());
+            telemetryData.addData("XDistance from X=48", returnDriveX(48));
+            telemetryData.addData("YDistance from Y=24", returnDriveY(24));
         } else {
             telemetryData.addData("Pos", "Unknown");
         }
     }
 
-
     String format(OpenGLMatrix transformationMatrix) {
         return transformationMatrix.formatAsTransform();
     }
 
+    public VuforiaLocalizer returnVuforiaInstance(){return vuforia;}
+
     //The subtracted and added values are to account for webcam position
     public float returnVuforiaX(){return (translation.get(0) / mmPerInch) - 8.25f;}
-
     public float returnVuforiaY(){return (translation.get(1) / mmPerInch) + 7.625f;}
 
+    public boolean isBlueGoalVisible(){return isBlueGoalVisibleLocal;}
 
-    //Completely untested
+    //Untested
     public float returnDriveX(float endXCoordinate){return endXCoordinate - returnVuforiaX();}
     public float returnDriveY(float endYCoordinate){return endYCoordinate - returnVuforiaY();}
 
-    public boolean isBlueGoalVisible(){return isBlueGoalVisible1;}
+
 
     //public float returnVuforiaZ(){return translation.get(2) / mmPerInch;}
 
     //public double returnVuforiaXRotation(){return rotation.firstAngle;}
-
     //public double returnVuforiaYRotation(){return rotation.secondAngle;}
-
     //public double returnVuforiaZRotation(){return rotation.thirdAngle;} //Heading
 
     //public VectorF returnVuforiaVectorF(){ return translation;}

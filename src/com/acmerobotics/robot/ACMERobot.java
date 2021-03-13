@@ -31,14 +31,14 @@ public class ACMERobot extends Robot {
 
         drive = new Drive(this, opMode);
         intake = new Intake(this);
-        ringDetector = new RingDetector(opMode.hardwareMap);
         launcher = new Launcher(this);
         wobbleGoal = new WobbleGoalSubSys(this);
         vuforiaSubsystem = new vuforiaSubsystem(this, opMode);
+        ringDetector = new RingDetector(opMode.hardwareMap, vuforiaSubsystem.returnVuforiaInstance());
 
         registerSubsytem(drive);
         registerSubsytem(intake);
-        registerSubsytem(ringDetector);
+        //registerSubsytem(ringDetector);
         registerSubsytem(launcher);
         registerSubsytem(wobbleGoal);
         registerSubsytem(vuforiaSubsystem);
