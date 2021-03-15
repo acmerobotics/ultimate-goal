@@ -26,7 +26,7 @@ wobbleGoalLift = robot.getServo("wobbleGoalLift");
 wobbleGoalHold = robot.getServo("wobbleGoalHold");
 
    wobbleGoalUp = 1;
-   wobbleGoalDown = 0.1;
+   wobbleGoalDown = 0.12;
    wobbleHold = 0.325; // 0.28
    wobbleRelease= 0.8;
    wobbleLiftHigh = 0.5;
