@@ -24,8 +24,8 @@ public class Launcher extends Subsystem {
     public Servo aimServo; //the higher position the lower the aim will be
     public Servo launcherServo;
 
-    public static double servoAim = 0.71; // higher for lower shot position
-    public static double servoAimCloseUp = 0.67;
+    public static double servoAim = 0.52; // higher for lower shot position
+    public static double servoAimCloseUp = 0.4;
 
     public static double kickPosition = 1;
     public static double resetPosition = 0.75;

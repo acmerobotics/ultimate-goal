@@ -12,6 +12,15 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 public class TeleOp extends LinearOpMode {
 
     private boolean isSlowMode = false;
+    private String shootingTarget = "High";
+
+    boolean inAutomatic = false;
+
+    boolean shooting = false;
+
+    boolean ready = true;
+
+    double shootingPos = 0;
 
     @Override
     public void runOpMode(){
@@ -34,14 +43,14 @@ public class TeleOp extends LinearOpMode {
 
         while (!isStopRequested()) {
 
-            if (!isSlowMode) {
-                Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-                robot.drive.setPower(v);
-            }
-
-            else{
-                Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
-                robot.drive.setSlowPower(v);
+            if (!inAutomatic) {
+                if (!isSlowMode) {
+                    Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+                    robot.drive.setPower(v);
+                } else {
+                    Pose2d v = new Pose2d(-gamepad1.left_stick_x, gamepad1.left_stick_y, gamepad1.right_stick_x);
+                    robot.drive.setSlowPower(v);
+                }
             }
 
             if (stickyGamepad.y){
@@ -61,7 +70,42 @@ public class TeleOp extends LinearOpMode {
 
             // press a to start launcher motor, press a again to stop
             if (stickyGamepad.x){
-                robot.launcher.shoot();
+                inAutomatic = true;
+
+                robot.drive.autoTrajectory(robot.drive.omniTicksPerInch(((int)  shootingPos - robot.drive.omniTrackerX.getCurrentPosition())));
+
+                ready = false;
+            }
+            if (inAutomatic && robot.drive.atStrafePositionAutomatic() && !shooting){
+
+                robot.drive.stopVel();
+
+                shooting = true;
+                ready = true;
+
+            }
+            if (shooting){
+
+//                robot.launcher.shootMid();
+//
+//                robot.runUntil(robot.launcher::isMaxVelocity);
+//
+//                robot.shootRingA();
+//                robot.shootRingA();
+//                robot.shootRingA();
+//
+//                robot.launcher.shoot();
+
+                shooting = false;
+
+                robot.drive.switchWheelDirections(true);
+
+                inAutomatic = false;
+            }
+
+            if (stickyGamepad.left_bumper){
+                shootingPos = robot.drive.omniTrackerX.getCurrentPosition();
+                robot.drive.prepareMotors();
             }
 
             // press trigger to kick ring and launcher, release to reset kicker
@@ -83,9 +127,15 @@ public class TeleOp extends LinearOpMode {
             // adjust aim to tower level
             if (stickyGamepad.dpad_up){
                 robot.launcher.shootHigh();
+                shootingTarget = "High";
             }
             if (stickyGamepad.dpad_down){
                 robot.launcher.shootMid();
+                shootingTarget = "Mid";
+            }
+
+            if (stickyGamepad.dpad_right){
+                robot.launcher.shoot();
             }
 
 
@@ -96,8 +146,12 @@ public class TeleOp extends LinearOpMode {
                 robot.grab();
             }
 
+            telemetry.addData("shooting target", shootingTarget); // high or mid
+            telemetry.addData("ready to shoot", ready);
+
             stickyGamepad.update();
             robot.update();
+            telemetry.update();
         }
     }
 }

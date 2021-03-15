@@ -56,7 +56,7 @@ public class CombinedBlueA extends Auto {
         robot.runUntil(robot.drive::atYPosition);
 
         // UNDO AVOID RING
-        robot.drive.strafeRight(5);
+        robot.drive.strafeRight(6);
         robot.runUntil(robot.drive::atStrafePosition);
 
 
@@ -128,14 +128,14 @@ public class CombinedBlueA extends Auto {
         }
 
         if (targetZone == TargetZone.C){
-            robot.drive.moveBack(63);
+            robot.drive.moveBack(55);
             robot.runUntil(robot.drive::atYPosition);
         }
 
 
         // STRAFE_TO_TOWER
         if (targetZone == TargetZone.A){
-            robot.drive.strafeRight(15);
+            robot.drive.strafeRight(10);
             robot.runUntil(robot.drive::atStrafePosition);
         }
 
@@ -167,7 +167,7 @@ public class CombinedBlueA extends Auto {
         robot.drive.moveForward((robot.len / 2) + 4);
         robot.runUntil(robot.drive::atYPosition);
 
-//        robot.drive.stopMotors();
+        robot.drive.stopMotors();
         robot.runUntilStop();
     }
 }

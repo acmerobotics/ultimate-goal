@@ -129,7 +129,7 @@ public class Drive extends Subsystem{
     public static double sI = 0;
     public static double sD = 0; // 0.00005
 
-    public static double cP = 0.04;
+    public static double cP = 0.07;
     public static double cI = 0;
     public static double cD = 0;
 
@@ -149,11 +149,11 @@ public class Drive extends Subsystem{
     public static double asI = 0;
     public static double asD = 0.0003;
 
-    public static double ashcP = 2;
+    public static double ashcP = 1;
     public static double ashcI = 0;
     public static double ashcD = 0;
 
-    public static double ascP = 0.005;
+    public static double ascP = 0.003;
     public static double ascI = 0;
     public static double ascD = 0;
 
@@ -433,11 +433,11 @@ public class Drive extends Subsystem{
                     correction1 = aStrafeHeadingCorrectionPidController.update(error1); // used to correct heading
                     correction2 = aStrafeCorrectionPIDController.update(error2);
 
-                    stopCancelEffect();
+                    stopCancelEffectWithPower();
 
-                    motors[0].setVelocity(correction0 - correction2);
+                    motors[0].setVelocity(correction0 - correction2 + correction3);
                     motors[1].setVelocity(-correction0 - -correction1);
-                    motors[2].setVelocity(correction0 - correction2 - correction1);
+                    motors[2].setVelocity(correction0 - correction2 - correction1 + correction3);
                     motors[3].setVelocity(-correction0);
 
                     break;
@@ -648,7 +648,7 @@ public class Drive extends Subsystem{
 
         lastPosition2 = currPosition;
 
-        if (Math.abs(currPosition) < 2 && der2 < 0.02 && der2 > -0.02){
+        if (Math.abs(currPosition) < 3 && der2 < 0.02 && der2 > -0.02){
             lastPosition2 = 0;
             return true;
         }
@@ -926,7 +926,7 @@ public class Drive extends Subsystem{
 
     }
 
-    private double omniTicksPerInch(int ticks){
+    public double omniTicksPerInch(int ticks){
         double circumference = 2 * Math.PI * TRACKER_RADIUS;
 
         return (circumference *  ticks / TRACKER_TICKS_PER_REV);
@@ -986,7 +986,7 @@ public class Drive extends Subsystem{
         return hasTeleOp != -1;
     }
 
-    private void prepareMotors(){
+    public void prepareMotors(){
         for (int i = 0; i < 4; i++){
             motors[i].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motors[i].setMode(DcMotorEx.RunMode.RUN_WITHOUT_ENCODER);

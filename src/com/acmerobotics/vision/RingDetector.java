@@ -26,13 +26,13 @@ public class RingDetector extends Subsystem {
 
     private boolean startDetecting = false;
 
-    public RingDetector (HardwareMap hardwareMap){
+    public RingDetector (HardwareMap hardwareMap, VuforiaLocalizer vuforiaInstance){
         super("RingDetector");
-        initVuforia(hardwareMap);
+        vuforia = vuforiaInstance;
         initTf(hardwareMap);
     }
 
-    private void initVuforia(HardwareMap hardwareMap){
+    /*private void initVuforia(HardwareMap hardwareMap){
 
         // create parameter instance, don't need cameraMonitorViewId (tf has their own)
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters();
@@ -44,7 +44,7 @@ public class RingDetector extends Subsystem {
 
         // create vuforia instance
         vuforia = ClassFactory.getInstance().createVuforia(parameters);
-    }
+    }*/
 
     private void initTf(HardwareMap hardwareMap){
         // get view id

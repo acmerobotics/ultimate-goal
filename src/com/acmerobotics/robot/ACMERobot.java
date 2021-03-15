@@ -13,7 +13,7 @@ public class ACMERobot extends Robot {
     public final RingDetector ringDetector;
     public final Launcher launcher; // adjust Launcher Version HERE!
     public final WobbleGoalSubSys wobbleGoal;
-    //public final vuforiaSubsystem vuforiaSubsystem;
+    public final vuforiaSubsystem vuforiaSubsystem;
 
     public double len = 17.4;
     public double width = 18;
@@ -30,17 +30,17 @@ public class ACMERobot extends Robot {
 
         drive = new Drive(this, opMode);
         intake = new Intake(this);
-        ringDetector = new RingDetector(opMode.hardwareMap);
         launcher = new Launcher(this);
         wobbleGoal = new WobbleGoalSubSys(this);
-        //vuforiaSubsystem = new vuforiaSubsystem(this, opMode);
+        vuforiaSubsystem = new vuforiaSubsystem(this, opMode);
+        ringDetector = new RingDetector(opMode.hardwareMap, vuforiaSubsystem.returnVuforiaInstance());
 
-        //registerSubsytem(vuforiaSubsystem);
         registerSubsytem(drive);
         registerSubsytem(intake);
         registerSubsytem(ringDetector);
         registerSubsytem(launcher);
         registerSubsytem(wobbleGoal);
+        registerSubsytem(vuforiaSubsystem);
     }
 
     public void shootRingA(){

@@ -33,9 +33,13 @@ public class TestTele extends LinearOpMode {
 
     double distanceFromLine = 0;
 
-    double getDistanceFromSpot = 0;
+    float getDistanceFromSpot = 40;
 
     double farPosition = 0; // farPos is the distance needed before switching servo position to further one
+
+    int multiplier = 1;
+
+    double shootingPos = 0;
 
 
     @Override
@@ -49,6 +53,8 @@ public class TestTele extends LinearOpMode {
 
         waitForStart();
 
+        //robot.vuforiaSubsystem.ultimateGoal.activate();
+
         while (!isStopRequested()) {
 
             if (!inAutomatic) {
@@ -56,10 +62,20 @@ public class TestTele extends LinearOpMode {
                 robot.drive.setPower(v);
             }
 
-            if (stickyGamepad.a){
+            if (stickyGamepad.x){
                 inAutomatic = true;
 
-                robot.drive.autoTrajectory(-24);
+//                if (robot.vuforiaSubsystem.returnVuforiaY() > getDistanceFromSpot){
+//                    multiplier = 1;
+//                }
+//
+//                else if (robot.vuforiaSubsystem.returnVuforiaY() < getDistanceFromSpot){
+//                    multiplier = -1;
+//                }
+
+                //robot.drive.autoTrajectory(Math.abs(robot.vuforiaSubsystem.returnDriveY(getDistanceFromSpot)) * multiplier);
+
+                robot.drive.autoTrajectory(robot.drive.omniTicksPerInch(((int)  shootingPos - robot.drive.omniTrackerX.getCurrentPosition())));
 
                 // determine shooting angle
 
@@ -103,12 +119,42 @@ public class TestTele extends LinearOpMode {
                 inAutomatic = false;
             }
 
-            if (gamepad1.x){
+            if (gamepad1.b){
                 robot.drive.stopVel();
             }
 
-            telemetry.addData("target visible: ", false);
+            if (stickyGamepad.left_bumper){
+                shootingPos = robot.drive.omniTrackerX.getCurrentPosition();
+                robot.drive.prepareMotors();
+            }
 
+            // press trigger to kick ring and launcher, release to reset kicker
+            if (gamepad1.right_trigger > 0.1){
+                robot.launcher.kickRing();
+            }
+            if (gamepad1.right_trigger <= 0.1){
+                robot.launcher.resetKicker();
+            }
+
+            if (stickyGamepad.y){
+                robot.launcher.shoot();
+            }
+
+            if (stickyGamepad.dpad_up){
+                robot.launcher.shootHigh();
+            }
+            if (stickyGamepad.dpad_down){
+                robot.launcher.shootMid();
+            }
+
+//            if (robot.vuforiaSubsystem.location != null) {
+//                telemetry.addData("y", robot.vuforiaSubsystem.returnVuforiaY());
+//                telemetry.addData("x", robot.vuforiaSubsystem.returnVuforiaX());
+//                telemetry.addData("distance from target y", robot.vuforiaSubsystem.returnDriveY(getDistanceFromSpot));
+//            }
+
+            telemetry.addData("shooting pos", shootingPos);
+            telemetry.addData("x pos", robot.drive.omniTrackerX.getCurrentPosition());
             telemetry.update();
             stickyGamepad.update();
             robot.update();

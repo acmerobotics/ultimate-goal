@@ -43,28 +43,34 @@ public class testAuto extends LinearOpMode {
 //            }
 
 
-        robot.drive.moveForward(48);
-        robot.runUntil(robot.drive::atYPosition);
-
-        robot.drive.strafeRight(24);
-        robot.runUntil(robot.drive::atStrafePosition);
-
-        robot.drive.moveBack(48);
-        robot.runUntil(robot.drive::atYPosition);
-
-        robot.drive.strafeLeft(24);
+//        robot.drive.moveForward(48);
+//        robot.runUntil(robot.drive::atYPosition);
+//
+//        robot.drive.strafeRight(24);
+//        robot.runUntil(robot.drive::atStrafePosition);
+//
+//        robot.drive.moveBack(48);
+//        robot.runUntil(robot.drive::atYPosition);
+//
+//        robot.drive.strafeLeft(24);
 
 //        robot.drive.automaticY(48);
 //        robot.runUntil(robot.drive::atYPosition);
 
-//        robot.drive.automaticStrafe(24);
-//        robot.runUntil(robot.drive::atStrafePosition);
+        robot.drive.automaticStrafe(24);
+        robot.runUntil(robot.drive::atStrafePosition);
 
 //        robot.drive.automaticY(-48);
 //        robot.runUntil(robot.drive::atYPosition);
 //
 //        robot.drive.automaticStrafe(-24);
 //        robot.runUntil(robot.drive::atStrafePosition);
+
+//        robot.drive.moveForward(0);
+
+        //robot.runUntil(robot.drive::atTurningPosition);
+
+        //robot.drive.stopMotors();
 
         //robot.drive.stopVel();
 
