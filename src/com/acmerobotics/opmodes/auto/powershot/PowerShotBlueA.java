@@ -14,6 +14,8 @@ public class PowerShotBlueA extends Auto {
         //robot.intake.moveServo();
         //robot.update();
 
+        robot.drive.stopAndResetMotors();
+
         //move into position
         robot.drive.moveForward(70 - (robot.len + robot.errorMargin));
         robot.runUntil(robot.drive::atYPosition);
@@ -36,7 +38,7 @@ public class PowerShotBlueA extends Auto {
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(10);
+        robot.drive.strafeRight(9);
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.stopMotors();
@@ -51,7 +53,7 @@ public class PowerShotBlueA extends Auto {
         robot.drive.turnTo(0);
         robot.runForTime(2000);
 
-        robot.drive.strafeRight(10);
+        robot.drive.strafeRight(9);
         robot.runUntil(robot.drive::atStrafePosition);
 
         robot.drive.stopMotors();
@@ -63,7 +65,7 @@ public class PowerShotBlueA extends Auto {
         robot.shootRingA();
 
         //park
-        robot.drive.moveForward((robot.len /2) + 2);
+        robot.drive.moveForward((robot.len) + 4);
         robot.runUntil(robot.drive::atYPosition);
 
         robot.drive.stopMotors();
